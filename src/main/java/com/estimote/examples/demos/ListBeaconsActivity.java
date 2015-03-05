@@ -28,7 +28,6 @@ import java.util.List;
  */
 public class ListBeaconsActivity extends Activity {
 
-
   private static final String TAG = ListBeaconsActivity.class.getSimpleName();
 
   public static final String EXTRAS_TARGET_ACTIVITY = "extrasTargetActivity";
