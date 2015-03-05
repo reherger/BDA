@@ -64,6 +64,10 @@
             android:name=".InsActivity"
             android:label="@string/title_activity_ins" >
         </activity>
+        <activity
+            android:name=".gitPushTest"
+            android:label="@string/title_activity_git_push_test" >
+        </activity>
     </application>
 
 </manifest>
