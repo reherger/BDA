@@ -78,7 +78,7 @@ public class InsActivity extends Activity {
                 try{
                     beaconManager.startMonitoring(region);
                 }catch (RemoteException e){
-                    Log.d(TAG, "Error while starting monitoring GIT TEST");
+                    Log.d(TAG, "Error while starting monitoring");
                 }
             }
         });
