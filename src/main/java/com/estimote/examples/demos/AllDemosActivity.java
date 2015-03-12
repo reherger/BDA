@@ -5,6 +5,16 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
+import org.xmlpull.v1.XmlPullParserException;
+
+import java.io.IOException;
+import java.util.List;
+
+import ch.hslu.herger.config.Configuration;
+import ch.hslu.herger.config.LocationReader;
+import ch.hslu.herger.config.XMLBeacon;
+import ch.hslu.herger.config.XMLLocation;
+
 /**
  * Shows all available demos.
  *
@@ -50,5 +60,21 @@ public class AllDemosActivity extends Activity {
             startActivity(intent);
         }
     });
+    findViewById(R.id.XMLReader_button).setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            setConfiguration();
+        }
+    });
   }
+
+    public void setConfiguration() {
+        try {
+            ((Configuration) this.getApplication()).setLocationList(LocationReader.readXML());
+        }catch (XmlPullParserException e) {
+            e.printStackTrace();
+        }catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

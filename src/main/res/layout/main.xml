@@ -3,9 +3,18 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
              android:layout_width="match_parent"
              android:layout_height="match_parent">
+
+    <TextView
+      android:id="@+id/tvNearestBeacon"
+      android:text="Nearest Beacon:"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent" />
+
+
   <ListView
       android:id="@+id/device_list"
       android:orientation="vertical"
       android:layout_width="match_parent"
-      android:layout_height="match_parent"/>
+      android:layout_height="match_parent"
+      android:layout_marginTop="20dp"/>
 </FrameLayout>

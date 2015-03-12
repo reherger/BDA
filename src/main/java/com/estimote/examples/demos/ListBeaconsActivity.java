@@ -10,7 +10,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.BaseAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 import com.estimote.sdk.Beacon;
 import com.estimote.sdk.BeaconManager;
@@ -51,6 +53,9 @@ public class ListBeaconsActivity extends Activity {
     list.setAdapter(adapter);
     list.setOnItemClickListener(createOnItemClickListener());
 
+    // Configure TV fornearest Beacon
+      final TextView tvNearestBeacon = (TextView) findViewById(R.id.tvNearestBeacon);
+
     // Configure verbose debug logging.
     L.enableDebugLogging(true);
 
@@ -67,6 +72,7 @@ public class ListBeaconsActivity extends Activity {
             // distance between device and beacon.
             getActionBar().setSubtitle("Found beacons: " + beacons.size());
             adapter.replaceWith(beacons);
+            tvNearestBeacon.setText("Nearest beacon: " + beacons.get(0).getMacAddress());
           }
         });
       }
@@ -166,6 +172,7 @@ public class ListBeaconsActivity extends Activity {
             Class<?> clazz = Class.forName(getIntent().getStringExtra(EXTRAS_TARGET_ACTIVITY));
             Intent intent = new Intent(ListBeaconsActivity.this, clazz);
             intent.putExtra(EXTRAS_BEACON, adapter.getItem(position));
+            System.out.println("AdapterPosition: "+position);
             startActivity(intent);
           } catch (ClassNotFoundException e) {
             Log.e(TAG, "Finding class by name failed", e);

@@ -5,11 +5,11 @@ import java.util.List;
 /**
  * Created by Reto Herger on 05.03.2015.
  */
-public class Location {
-    String id;
-    String name;
-    String pathToMap;
-    List<XMLBeacon> beaconList;
+public class XMLLocation {
+    private String id;
+    private String name;
+    private String pathToMap;
+    private List<XMLBeacon> beaconList;
 
     public String getId() {
         return id;

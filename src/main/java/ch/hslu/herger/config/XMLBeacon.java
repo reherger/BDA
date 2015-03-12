@@ -4,9 +4,11 @@ package ch.hslu.herger.config;
  * Created by Reto Herger on 05.03.2015.
  */
 public class XMLBeacon {
-    String uuid;
-    String major;
-    String minor;
+    private String uuid;
+    private String major;
+    private String minor;
+    private String xPos;
+    private String yPos;
 
     public String getUuid() {
         return uuid;
@@ -26,4 +28,8 @@ public class XMLBeacon {
     public void setMinor(String minor) {
         this.minor = minor;
     }
+    public String getxPos() { return xPos; }
+    public void setxPos(String xPos) { this.xPos = xPos; }
+    public String getyPos() { return yPos; }
+    public void setyPos(String yPos) { this.yPos = yPos; }
 }
