@@ -1,8 +1,6 @@
 package com.estimote.examples.demos;
 
 import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.RemoteException;
 import android.util.Log;
@@ -46,7 +44,7 @@ public class DistanceBeaconActivity extends Activity {
     setContentView(R.layout.distance_view);
     dotView = findViewById(R.id.dot);
 
-    beacon = getIntent().getParcelableExtra(ListBeaconsActivity.EXTRAS_BEACON);
+    beacon = getIntent().getParcelableExtra(BeaconScannerActivity.EXTRAS_BEACON);
     region = new Region("regionid", beacon.getProximityUUID(), beacon.getMajor(), beacon.getMinor());
     if (beacon == null) {
       Toast.makeText(this, "Beacon not found in intent extras", Toast.LENGTH_LONG).show();

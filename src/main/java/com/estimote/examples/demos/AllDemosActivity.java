@@ -8,17 +8,14 @@ import android.view.View;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
-import java.util.List;
 
 import ch.hslu.herger.config.Configuration;
 import ch.hslu.herger.config.LocationReader;
-import ch.hslu.herger.config.XMLBeacon;
-import ch.hslu.herger.config.XMLLocation;
 
 /**
  * Shows all available demos.
  *
- * @author wiktor@estimote.com (Wiktor Gworek)
+ * @author Reto Herger
  */
 public class AllDemosActivity extends Activity {
 
@@ -27,6 +24,9 @@ public class AllDemosActivity extends Activity {
     super.onCreate(savedInstanceState);
 
     setContentView(R.layout.all_demos);
+
+    // Read configuration file
+    setConfiguration();
 
     findViewById(R.id.distance_demo_button).setOnClickListener(new View.OnClickListener() {
       @Override
@@ -55,8 +55,8 @@ public class AllDemosActivity extends Activity {
     findViewById(R.id.ins_button).setOnClickListener(new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            Intent intent = new Intent(AllDemosActivity.this, ListBeaconsActivity.class);
-            intent.putExtra(ListBeaconsActivity.EXTRAS_TARGET_ACTIVITY, InsActivity.class.getName());
+            Intent intent = new Intent(AllDemosActivity.this, BeaconScannerActivity.class);
+            intent.putExtra(BeaconScannerActivity.EXTRAS_TARGET_ACTIVITY, InsActivity.class.getName());
             startActivity(intent);
         }
     });

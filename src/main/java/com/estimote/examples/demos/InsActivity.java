@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.RemoteException;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
@@ -36,7 +35,7 @@ public class InsActivity extends Activity {
         setContentView(R.layout.ins);
         getActionBar().setDisplayHomeAsUpEnabled(true);
 
-        Beacon beacon = getIntent().getParcelableExtra(ListBeaconsActivity.EXTRAS_BEACON);
+        Beacon beacon = getIntent().getParcelableExtra(BeaconScannerActivity.EXTRAS_BEACON);
         region = new Region("regionID", beacon.getProximityUUID(), beacon.getMajor(), beacon.getMinor());
         notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         beaconManager = new BeaconManager(this);
@@ -109,7 +108,7 @@ public class InsActivity extends Activity {
         notification.defaults |= Notification.DEFAULT_LIGHTS;
         notificationManager.notify(NOTIFICATION_ID, notification);
 
-        TextView insStatusTextView = (TextView) findViewById(R.id.insStatus);
-        insStatusTextView.setText(msg+" "+region);
+        //TextView insStatusTextView = (TextView) findViewById(R.id.insStatus);
+        //insStatusTextView.setText(msg+" "+region);
     }
 }

@@ -36,7 +36,7 @@ public class CharacteristicsDemoActivity extends Activity {
     afterConnectedView = findViewById(R.id.after_connected);
     minorEditView = (EditText) findViewById(R.id.minor);
 
-    beacon = getIntent().getParcelableExtra(ListBeaconsActivity.EXTRAS_BEACON);
+    beacon = getIntent().getParcelableExtra(BeaconScannerActivity.EXTRAS_BEACON);
     connection = new BeaconConnection(this, beacon, createConnectionCallback());
     findViewById(R.id.update).setOnClickListener(createUpdateButtonListener());
   }

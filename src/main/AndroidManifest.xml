@@ -40,7 +40,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ListBeaconsActivity"
+            android:name=".BeaconScannerActivity"
             android:label="Select Beacon"
             android:screenOrientation="portrait" />
         <activity

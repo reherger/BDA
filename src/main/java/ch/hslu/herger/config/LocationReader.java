@@ -19,15 +19,6 @@ import java.util.List;
 public class LocationReader {
 
     public final static String SAMPLE_XML =
-    //        "<?xml version=\"1.0\"?>\n"+
-    //                "\n"+
-    //                "<poem xmlns=\"http://www.megginson.com/ns/exp/poetry\">\n"+
-    //               "<title>Roses are Red</title>\n"+
-    //                "<l>Roses are red,</l>\n"+
-    //                "<l>Violets are blue;</l>\n"+
-    //                "<l>Sugar is sweet,</l>\n"+
-    //               "<l>And I love you.</l>\n"+
-    //                "</poem>";
     "<?xml version=\"1.0\"?>"+
     "<locations>"+
         "<location>"+
@@ -35,19 +26,29 @@ public class LocationReader {
         "<name>HSLU</name>"+
         "<pathToMap>hslu.jpg</pathToMap>"+
         "<beaconList>"+
+            // blue
             "<beacon>"+
                 "<uuid>01</uuid>"+
-                "<major>011</major>"+
-                "<minor>0111</minor>"+
-                "<xPos>15</xPos>"+
-                "<yPos>30</yPos>"+
+                "<major>110</major>"+
+                "<minor>1110</minor>"+
+                "<xPos>280</xPos>"+
+                "<yPos>12</yPos>"+
             "</beacon>"+
+            // green
             "<beacon>"+
                 "<uuid>02</uuid>"+
-                "<major>022</major>"+
-                "<minor>0222</minor>"+
-                "<xPos>100</xPos>"+
-                "<yPos>100</yPos>"+
+                "<major>111</major>"+
+                "<minor>1120</minor>"+
+                "<xPos>145</xPos>"+
+                "<yPos>75</yPos>"+
+            "</beacon>"+
+            // lightBlue
+            "<beacon>"+
+            "<uuid>02</uuid>"+
+            "<major>112</major>"+
+            "<minor>1130</minor>"+
+            "<xPos>280</xPos>"+
+            "<yPos>145</yPos>"+
             "</beacon>"+
         "</beaconList>"+
         "</location>"+

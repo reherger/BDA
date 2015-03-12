@@ -44,7 +44,7 @@ public class NotifyDemoActivity extends Activity {
     setContentView(R.layout.notify_demo);
     getActionBar().setDisplayHomeAsUpEnabled(true);
 
-    Beacon beacon = getIntent().getParcelableExtra(ListBeaconsActivity.EXTRAS_BEACON);
+    Beacon beacon = getIntent().getParcelableExtra(BeaconScannerActivity.EXTRAS_BEACON);
     region = new Region("regionId", beacon.getProximityUUID(), beacon.getMajor(), beacon.getMinor());
     notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
     beaconManager = new BeaconManager(this);
