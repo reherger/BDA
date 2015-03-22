@@ -9,6 +9,18 @@
         android:text="Nearest Beacon:"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+    <TextView
+        android:id="@+id/tvDistX"
+        android:text="Distance X: "
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="15dp"/>
+    <TextView
+        android:id="@+id/tvDistY"
+        android:text="Distance Y:"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="30dp"/>
 
     <AbsoluteLayout
         android:id="@+id/positionMap"

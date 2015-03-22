@@ -18,42 +18,55 @@ public final class R {
         public static final int beacon_gray=0x7f020000;
         public static final int bg_distance=0x7f020001;
         public static final int dot=0x7f020002;
+        public static final int pavillon_test=0x7f020003;
     }
     public static final class id {
-        public static final int action_settings=0x7f07000e;
-        public static final int after_connected=0x7f070006;
-        public static final int beacon_details=0x7f070005;
+        public static final int Map=0x7f070011;
+        public static final int XMLReader_button=0x7f070004;
+        public static final int action_settings=0x7f070014;
+        public static final int after_connected=0x7f070007;
+        public static final int beacon_details=0x7f070006;
         public static final int characteristics_demo_button=0x7f070002;
-        public static final int device_list=0x7f07000d;
+        public static final int device_list=0x7f070013;
         public static final int distance_demo_button=0x7f070000;
-        public static final int dot=0x7f07000b;
-        public static final int insStatus=0x7f07000c;
+        public static final int dot=0x7f07000c;
         public static final int ins_button=0x7f070003;
-        public static final int minor=0x7f070007;
+        public static final int minor=0x7f070008;
         public static final int notify_demo_button=0x7f070001;
-        public static final int refresh=0x7f07000f;
-        public static final int root=0x7f070009;
-        public static final int sonar=0x7f07000a;
-        public static final int status=0x7f070004;
-        public static final int update=0x7f070008;
+        public static final int position=0x7f070012;
+        public static final int positionMap=0x7f070010;
+        public static final int refresh=0x7f070015;
+        public static final int root=0x7f07000a;
+        public static final int sonar=0x7f07000b;
+        public static final int status=0x7f070005;
+        public static final int tvDistX=0x7f07000e;
+        public static final int tvDistY=0x7f07000f;
+        public static final int tvNearestBeacon=0x7f07000d;
+        public static final int update=0x7f070009;
     }
     public static final class layout {
         public static final int actionbar_indeterminate_progress=0x7f030000;
-        public static final int all_demos=0x7f030001;
-        public static final int characteristics_demo=0x7f030002;
-        public static final int device_item=0x7f030003;
-        public static final int distance_view=0x7f030004;
-        public static final int ins=0x7f030005;
-        public static final int main=0x7f030006;
-        public static final int notify_demo=0x7f030007;
+        public static final int activity_linear_acceleration=0x7f030001;
+        public static final int all_demos=0x7f030002;
+        public static final int characteristics_demo=0x7f030003;
+        public static final int device_item=0x7f030004;
+        public static final int distance_view=0x7f030005;
+        public static final int ins=0x7f030006;
+        public static final int localization=0x7f030007;
+        public static final int main=0x7f030008;
+        public static final int notify_demo=0x7f030009;
     }
     public static final class menu {
-        public static final int menu_ins=0x7f060000;
-        public static final int scan_menu=0x7f060001;
+        public static final int menu_git_push_test=0x7f060000;
+        public static final int menu_ins=0x7f060001;
+        public static final int menu_linear_acceleration=0x7f060002;
+        public static final int scan_menu=0x7f060003;
     }
     public static final class string {
         public static final int action_settings=0x7f050000;
         public static final int hello_world=0x7f050001;
-        public static final int title_activity_ins=0x7f050002;
+        public static final int title_activity_git_push_test=0x7f050002;
+        public static final int title_activity_ins=0x7f050003;
+        public static final int title_activity_linear_acceleration=0x7f050004;
     }
 }

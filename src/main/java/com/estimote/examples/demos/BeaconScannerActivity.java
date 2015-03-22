@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Canvas;
 import android.os.Bundle;
 import android.os.RemoteException;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -28,6 +29,8 @@ import ch.hslu.herger.config.Configuration;
 import ch.hslu.herger.config.LocationReader;
 import ch.hslu.herger.config.XMLBeacon;
 import ch.hslu.herger.config.XMLLocation;
+import ch.hslu.herger.data.DataHandler;
+import ch.hslu.herger.sensor.LinearAccelerationActivity;
 
 /**
  * Displays list of found beacons sorted by RSSI.
@@ -46,17 +49,26 @@ public class BeaconScannerActivity extends Activity {
   private static final Region ALL_ESTIMOTE_BEACONS_REGION = new Region("rid", null, null, null);
 
   // Constant for converting Px to Dp
-  private final float pxTodp = getResources().getDisplayMetrics().density;
+  private DisplayMetrics metrics;
+  private float pxTodp;
 
   private BeaconManager beaconManager;
   //private LeDeviceListAdapter adapter;
   private List<Beacon> beaconList;
+  private DataHandler dataHandler;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.ins);
     getActionBar().setDisplayHomeAsUpEnabled(true);
+
+    // Set Display Metrics
+    metrics = getApplicationContext().getResources().getDisplayMetrics();
+    pxTodp = metrics.density;
+
+    // Initialize DataHandler
+    dataHandler = DataHandler.getInstance();
 
     // Configure verbose debug logging.
     L.enableDebugLogging(true);
@@ -67,6 +79,8 @@ public class BeaconScannerActivity extends Activity {
     // Disable Map until known beacon discovered
     final AbsoluteLayout positionMap = (AbsoluteLayout) findViewById(R.id.positionMap);
     final TextView tvNearestBeacon = (TextView) findViewById(R.id.tvNearestBeacon);
+    final TextView tvDistX = (TextView) findViewById(R.id.tvDistX);
+    final TextView tvDistY = (TextView) findViewById(R.id.tvDistY);
     final ImageView position = (ImageView) findViewById(R.id.position);
     positionMap.setVisibility(View.INVISIBLE);
 
@@ -78,6 +92,12 @@ public class BeaconScannerActivity extends Activity {
 
           beaconList = beacons;
 
+          if(beaconList.size()>0){{
+              // Start Sensor Activities
+              startSensorActivities();
+
+          }}
+
         // Note that results are not delivered on UI thread.
         runOnUiThread(new Runnable() {
           @Override
@@ -86,6 +106,7 @@ public class BeaconScannerActivity extends Activity {
             // distance between device and beacon.
             getActionBar().setSubtitle("Found beacons: " + beacons.size());
 
+            // TODO Move this if check out of UI Thread
             if(beaconList.size()>0) {
                 XMLBeacon currentBeacon = BeaconComparator.isBeaconKnown(beaconList.get(0), locationList);
                 if(currentBeacon != null) {
@@ -96,6 +117,8 @@ public class BeaconScannerActivity extends Activity {
                     position.setX(Float.parseFloat(currentBeacon.getxPos())*pxTodp);
                     position.setY(Float.parseFloat(currentBeacon.getyPos())*pxTodp);
 
+                    tvDistX.setText("Distance x: "+Float.toString(dataHandler.getXDist()));
+                    tvDistY.setText("Distance y: "+Float.toString(dataHandler.getYDist()));
                     tvNearestBeacon.setText("Nearest beacon: " + currentBeacon.getMajor() +"Beacon RSSI: "+beaconList.get(0).getRssi() + "Meassured Power: "+beaconList.get(0).getMeasuredPower());
                 }
             }else{
@@ -191,6 +214,12 @@ public class BeaconScannerActivity extends Activity {
         }
       }
     });
+  }
+
+  private void startSensorActivities(){
+      Intent intent = new Intent(this, LinearAccelerationActivity.class);
+      intent.putExtra("EXTRA_MESSAGE","Start Sensoring");
+      startActivity(intent);
   }
 
 

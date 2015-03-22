@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Toast;
 
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -71,6 +72,7 @@ public class AllDemosActivity extends Activity {
     public void setConfiguration() {
         try {
             ((Configuration) this.getApplication()).setLocationList(LocationReader.readXML());
+            Toast.makeText(this, "Configuration is set", Toast.LENGTH_LONG).show();
         }catch (XmlPullParserException e) {
             e.printStackTrace();
         }catch (IOException e) {

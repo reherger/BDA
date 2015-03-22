@@ -121,3 +121,9 @@ ADDED from AndroidManifest.xml:64:9
 		ADDED from AndroidManifest.xml:66:13
 	android:name
 		ADDED from AndroidManifest.xml:65:13
+activity#ch.hslu.herger.sensor.LinearAccelerationActivity
+ADDED from AndroidManifest.xml:68:9
+	android:label
+		ADDED from AndroidManifest.xml:70:13
+	android:name
+		ADDED from AndroidManifest.xml:69:13
