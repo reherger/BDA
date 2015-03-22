@@ -9,6 +9,7 @@ import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.estimote.examples.demos.R;
@@ -34,10 +35,18 @@ public class LinearAccelerationActivity extends Activity implements SensorEventL
     private Float[] xDirection;
     private Float[] yDirection;
 
+    private TextView tvDistX;
+    private TextView tvDistY;
+    private TextView tvCompass;
+    private TextView tvSpeedX;
+    private TextView tvSpeedY;
+    private TextView tvXAcc;
+    private TextView tvYAcc;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //setContentView(R.layout.activity_linear_acceleration);
+        setContentView(R.layout.activity_linear_acceleration);
 
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
@@ -47,10 +56,18 @@ public class LinearAccelerationActivity extends Activity implements SensorEventL
 
         dataHandler = DataHandler.getInstance();
 
-        lastUpdate = System.currentTimeMillis();
+        lastUpdate = (long) 0;
 
         xDirection = new Float[] {(float)0,(float)0};
         yDirection = new Float[] {(float)0,(float)0};
+
+        tvDistX = (TextView) findViewById(R.id.tvDistX);
+        tvDistY = (TextView) findViewById(R.id.tvDistY);
+        tvCompass = (TextView) findViewById(R.id.tvCompass);
+        tvSpeedX = (TextView) findViewById(R.id.tvSpeedX);
+        tvSpeedY = (TextView) findViewById(R.id.tvSpeedY);
+        tvXAcc = (TextView) findViewById(R.id.tvXAcc);
+        tvYAcc = (TextView) findViewById(R.id.tvYAcc);
     }
 
     protected void onResume() {
@@ -71,25 +88,26 @@ public class LinearAccelerationActivity extends Activity implements SensorEventL
     public void onSensorChanged(SensorEvent event) {
         Sensor changedSensor = event.sensor;
 
-        if(lastUpdate != 0.0) {
-            lastUpdate = actualTime;
-        }
-        actualTime = event.timestamp;
-
         if(changedSensor.getType() == Sensor.TYPE_LINEAR_ACCELERATION){
-            // if total time is smaller than 10sec keep measuring
+
+            lastUpdate = actualTime;
+            actualTime = event.timestamp;
+            //System.out.println("actualTime = "+actualTime);
+            //System.out.println("lastUpdate = "+lastUpdate);
+            //System.out.println("dt = "+((actualTime-lastUpdate)/10000000000.0));
 
                 float x = event.values[0];
                 float y = event.values[1];
                 //float z = event.values[2];
 
                 xDirection[0] = xDirection[1];
-                xDirection[1] = event.values[0];
+                xDirection[1] = x;
 
                 yDirection[0] = yDirection[1];
-                yDirection[1] = event.values[1];
+                yDirection[1] = y;
 
                 dataHandler.calcPos(xDirection, yDirection, lastUpdate, actualTime);
+                displayData();
         }
         if(changedSensor.getType() == Sensor.TYPE_ORIENTATION){
             // angle between the magnetic north direction
@@ -98,6 +116,16 @@ public class LinearAccelerationActivity extends Activity implements SensorEventL
 
             dataHandler.setCompass(azimuth);
         }
+    }
+
+    public void displayData(){
+        tvCompass.setText("Compass :"+dataHandler.getCompass());
+        tvSpeedX.setText("Speed X: "+Float.toString(dataHandler.getXSpeed()));
+        tvSpeedY.setText("Speed Y:"+Float.toString(dataHandler.getYSpeed()));
+        tvDistX.setText("Distance X:"+Float.toString(dataHandler.getXDist()));
+        tvDistY.setText("Distance Y:"+Float.toString(dataHandler.getYDist()));
+        tvXAcc.setText("Acceleration X: "+Float.toString(dataHandler.getxAcc()));
+        tvYAcc.setText("Acceleration Y: "+Float.toString(dataHandler.getyAcc()));
     }
 
 }

@@ -21,28 +21,34 @@ public final class R {
         public static final int pavillon_test=0x7f020003;
     }
     public static final class id {
-        public static final int Map=0x7f070011;
-        public static final int XMLReader_button=0x7f070004;
-        public static final int action_settings=0x7f070014;
-        public static final int after_connected=0x7f070007;
-        public static final int beacon_details=0x7f070006;
-        public static final int characteristics_demo_button=0x7f070002;
-        public static final int device_list=0x7f070013;
-        public static final int distance_demo_button=0x7f070000;
-        public static final int dot=0x7f07000c;
-        public static final int ins_button=0x7f070003;
-        public static final int minor=0x7f070008;
-        public static final int notify_demo_button=0x7f070001;
-        public static final int position=0x7f070012;
-        public static final int positionMap=0x7f070010;
-        public static final int refresh=0x7f070015;
-        public static final int root=0x7f07000a;
-        public static final int sonar=0x7f07000b;
-        public static final int status=0x7f070005;
-        public static final int tvDistX=0x7f07000e;
-        public static final int tvDistY=0x7f07000f;
-        public static final int tvNearestBeacon=0x7f07000d;
-        public static final int update=0x7f070009;
+        public static final int Map=0x7f070017;
+        public static final int XMLReader_button=0x7f07000c;
+        public static final int action_settings=0x7f07001a;
+        public static final int after_connected=0x7f07000f;
+        public static final int beacon_details=0x7f07000e;
+        public static final int characteristics_demo_button=0x7f070009;
+        public static final int device_list=0x7f070019;
+        public static final int distance_demo_button=0x7f070007;
+        public static final int dot=0x7f070014;
+        public static final int ins_button=0x7f07000a;
+        public static final int minor=0x7f070010;
+        public static final int notify_demo_button=0x7f070008;
+        public static final int position=0x7f070018;
+        public static final int positionMap=0x7f070016;
+        public static final int refresh=0x7f07001b;
+        public static final int root=0x7f070012;
+        public static final int sensorTest_Button=0x7f07000b;
+        public static final int sonar=0x7f070013;
+        public static final int status=0x7f07000d;
+        public static final int tvCompass=0x7f070000;
+        public static final int tvDistX=0x7f070003;
+        public static final int tvDistY=0x7f070004;
+        public static final int tvNearestBeacon=0x7f070015;
+        public static final int tvSpeedX=0x7f070001;
+        public static final int tvSpeedY=0x7f070002;
+        public static final int tvXAcc=0x7f070005;
+        public static final int tvYAcc=0x7f070006;
+        public static final int update=0x7f070011;
     }
     public static final class layout {
         public static final int actionbar_indeterminate_progress=0x7f030000;

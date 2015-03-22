@@ -21,6 +21,12 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="30dp"/>
+    <TextView
+        android:id="@+id/tvCompass"
+        android:text="Compass :"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="45dp"/>
 
     <AbsoluteLayout
         android:id="@+id/positionMap"

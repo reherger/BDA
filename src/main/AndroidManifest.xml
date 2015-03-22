@@ -67,8 +67,8 @@
         </activity>
         <activity
             android:name="ch.hslu.herger.sensor.LinearAccelerationActivity"
-            android:label="@string/title_activity_linear_acceleration"
-            android:theme="@android:style/Theme.NoDisplay">
+            android:label="@string/title_activity_linear_acceleration" >
+            <!-- android:theme="@android:style/Theme.NoDisplay"> -->
         </activity>
     </application>
 

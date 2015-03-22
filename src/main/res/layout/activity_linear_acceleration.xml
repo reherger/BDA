@@ -6,7 +6,48 @@
     android:paddingBottom="@dimen/activity_vertical_margin"
     tools:context="ch.hslu.herger.sensor.LinearAccelerationActivity">
 
-    <TextView android:text="@string/hello_world" android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+    <TextView
+        android:id="@+id/tvCompass"
+        android:text="Compass :"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+    <TextView
+        android:id="@+id/tvSpeedX"
+        android:text="Distance X: "
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="15dp"/>
+    <TextView
+        android:id="@+id/tvSpeedY"
+        android:text="Distance Y:"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="30dp"/>
+
+    <TextView
+        android:id="@+id/tvDistX"
+        android:text="Distance X: "
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="45dp"/>
+    <TextView
+        android:id="@+id/tvDistY"
+        android:text="Distance Y:"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="60dp"/>
+    <TextView
+        android:id="@+id/tvXAcc"
+        android:text="Acceleration X:"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="75dp"/>
+    <TextView
+        android:id="@+id/tvYAcc"
+        android:text="Acceleration Y:"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="90dp"/>
+
 
 </RelativeLayout>

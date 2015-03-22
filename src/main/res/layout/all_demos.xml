@@ -30,6 +30,12 @@
       android:text="Indoor Navigation System"/>
 
   <Button
+      android:id="@+id/sensorTest_Button"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:text="Sensor Test"/>
+
+  <Button
       android:id="@+id/XMLReader_button"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"

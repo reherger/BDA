@@ -12,6 +12,7 @@ import java.io.IOException;
 
 import ch.hslu.herger.config.Configuration;
 import ch.hslu.herger.config.LocationReader;
+import ch.hslu.herger.sensor.LinearAccelerationActivity;
 
 /**
  * Shows all available demos.
@@ -61,6 +62,16 @@ public class AllDemosActivity extends Activity {
             startActivity(intent);
         }
     });
+
+      findViewById(R.id.sensorTest_Button).setOnClickListener(new View.OnClickListener() {
+          @Override
+          public void onClick(View v) {
+              Intent intent = new Intent(AllDemosActivity.this, LinearAccelerationActivity.class);
+              intent.putExtra(BeaconScannerActivity.EXTRAS_TARGET_ACTIVITY, InsActivity.class.getName());
+              startActivity(intent);
+          }
+      });
+
     findViewById(R.id.XMLReader_button).setOnClickListener(new View.OnClickListener() {
         @Override
         public void onClick(View v) {

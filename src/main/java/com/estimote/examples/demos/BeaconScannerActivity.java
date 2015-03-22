@@ -81,8 +81,12 @@ public class BeaconScannerActivity extends Activity {
     final TextView tvNearestBeacon = (TextView) findViewById(R.id.tvNearestBeacon);
     final TextView tvDistX = (TextView) findViewById(R.id.tvDistX);
     final TextView tvDistY = (TextView) findViewById(R.id.tvDistY);
+    final TextView tvCompass = (TextView) findViewById(R.id.tvCompass);
     final ImageView position = (ImageView) findViewById(R.id.position);
     positionMap.setVisibility(View.INVISIBLE);
+
+    // Start Sensor Activities
+    // startSensorActivities();
 
     // Configure BeaconManager.
     beaconManager = new BeaconManager(this);
@@ -91,12 +95,6 @@ public class BeaconScannerActivity extends Activity {
       public void onBeaconsDiscovered(final Region region, final List<Beacon> beacons) {
 
           beaconList = beacons;
-
-          if(beaconList.size()>0){{
-              // Start Sensor Activities
-              startSensorActivities();
-
-          }}
 
         // Note that results are not delivered on UI thread.
         runOnUiThread(new Runnable() {
@@ -117,8 +115,9 @@ public class BeaconScannerActivity extends Activity {
                     position.setX(Float.parseFloat(currentBeacon.getxPos())*pxTodp);
                     position.setY(Float.parseFloat(currentBeacon.getyPos())*pxTodp);
 
-                    tvDistX.setText("Distance x: "+Float.toString(dataHandler.getXDist()));
-                    tvDistY.setText("Distance y: "+Float.toString(dataHandler.getYDist()));
+                    tvDistX.setText("Distance x: "+Math.round(dataHandler.getXDist()));
+                    tvDistY.setText("Distance y: "+Math.round(dataHandler.getYDist()));
+                    tvCompass.setText("Compass: "+Float.toString(dataHandler.getCompass()));
                     tvNearestBeacon.setText("Nearest beacon: " + currentBeacon.getMajor() +"Beacon RSSI: "+beaconList.get(0).getRssi() + "Meassured Power: "+beaconList.get(0).getMeasuredPower());
                 }
             }else{
