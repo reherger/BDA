@@ -21,34 +21,58 @@ public final class R {
         public static final int pavillon_test=0x7f020003;
     }
     public static final class id {
-        public static final int Map=0x7f070017;
-        public static final int XMLReader_button=0x7f07000c;
-        public static final int action_settings=0x7f07001a;
-        public static final int after_connected=0x7f07000f;
-        public static final int beacon_details=0x7f07000e;
+        public static final int Map=0x7f070018;
+        public static final int XMLReader_button=0x7f07000d;
+        public static final int action_settings=0x7f070032;
+        public static final int after_connected=0x7f070010;
+        public static final int beacon_details=0x7f07000f;
         public static final int characteristics_demo_button=0x7f070009;
-        public static final int device_list=0x7f070019;
+        public static final int device_list=0x7f07001a;
         public static final int distance_demo_button=0x7f070007;
-        public static final int dot=0x7f070014;
+        public static final int dot=0x7f070015;
         public static final int ins_button=0x7f07000a;
-        public static final int minor=0x7f070010;
+        public static final int minor=0x7f070011;
         public static final int notify_demo_button=0x7f070008;
-        public static final int position=0x7f070018;
-        public static final int positionMap=0x7f070016;
-        public static final int refresh=0x7f07001b;
-        public static final int root=0x7f070012;
+        public static final int position=0x7f070019;
+        public static final int positionMap=0x7f070017;
+        public static final int radio0=0x7f07002f;
+        public static final int radio1=0x7f070030;
+        public static final int radio2=0x7f070031;
+        public static final int radioGroup1=0x7f07002e;
+        public static final int refresh=0x7f070033;
+        public static final int root=0x7f070013;
+        public static final int sensorFusion_Button=0x7f07000c;
         public static final int sensorTest_Button=0x7f07000b;
-        public static final int sonar=0x7f070013;
-        public static final int status=0x7f07000d;
+        public static final int sonar=0x7f070014;
+        public static final int status=0x7f07000e;
+        public static final int tableLayout1=0x7f07001b;
+        public static final int tableRow1=0x7f07001c;
+        public static final int tableRow2=0x7f07001f;
+        public static final int tableRow3=0x7f070022;
+        public static final int tableRow4=0x7f070025;
+        public static final int tableRow5=0x7f070028;
+        public static final int tableRow6=0x7f07002b;
+        public static final int textView1=0x7f07001d;
+        public static final int textView2=0x7f070020;
+        public static final int textView3=0x7f070023;
+        public static final int textView4=0x7f07001e;
+        public static final int textView5=0x7f070021;
+        public static final int textView6=0x7f070024;
+        public static final int textViewLAX=0x7f070026;
+        public static final int textViewLAXValue=0x7f070027;
+        public static final int textViewLAY=0x7f070029;
+        public static final int textViewLAYValue=0x7f07002a;
+        public static final int textViewLAZ=0x7f07002c;
+        public static final int textViewLAZValue=0x7f07002d;
         public static final int tvCompass=0x7f070000;
         public static final int tvDistX=0x7f070003;
         public static final int tvDistY=0x7f070004;
-        public static final int tvNearestBeacon=0x7f070015;
+        public static final int tvNearestBeacon=0x7f070016;
         public static final int tvSpeedX=0x7f070001;
         public static final int tvSpeedY=0x7f070002;
         public static final int tvXAcc=0x7f070005;
         public static final int tvYAcc=0x7f070006;
-        public static final int update=0x7f070011;
+        public static final int update=0x7f070012;
     }
     public static final class layout {
         public static final int actionbar_indeterminate_progress=0x7f030000;
@@ -61,6 +85,7 @@ public final class R {
         public static final int localization=0x7f030007;
         public static final int main=0x7f030008;
         public static final int notify_demo=0x7f030009;
+        public static final int sensor_fusion=0x7f03000a;
     }
     public static final class menu {
         public static final int menu_git_push_test=0x7f060000;
@@ -74,5 +99,6 @@ public final class R {
         public static final int title_activity_git_push_test=0x7f050002;
         public static final int title_activity_ins=0x7f050003;
         public static final int title_activity_linear_acceleration=0x7f050004;
+        public static final int title_activity_sensor_fusion=0x7f050005;
     }
 }

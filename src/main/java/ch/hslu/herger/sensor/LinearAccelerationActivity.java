@@ -73,8 +73,8 @@ public class LinearAccelerationActivity extends Activity implements SensorEventL
     protected void onResume() {
         super.onResume();
         lastUpdate = 0;
-        mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
-        mSensorManager.registerListener(this, mMagnetometer, SensorManager.SENSOR_DELAY_NORMAL);
+        mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_FASTEST);
+        mSensorManager.registerListener(this, mMagnetometer, SensorManager.SENSOR_DELAY_FASTEST);
     }
 
     protected void onPause() {

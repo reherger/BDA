@@ -5,5 +5,6 @@
     <string name="action_settings">Settings</string>
     <string name="title_activity_git_push_test">gitPushTest</string>
     <string name="title_activity_linear_acceleration">LinearAccelerationActivity</string>
+    <string name="title_activity_sensor_fusion">SensorFusion</string>
 
 </resources>
