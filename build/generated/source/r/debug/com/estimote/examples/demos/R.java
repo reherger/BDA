@@ -23,7 +23,7 @@ public final class R {
     public static final class id {
         public static final int Map=0x7f070018;
         public static final int XMLReader_button=0x7f07000d;
-        public static final int action_settings=0x7f070032;
+        public static final int action_settings=0x7f070039;
         public static final int after_connected=0x7f070010;
         public static final int beacon_details=0x7f07000f;
         public static final int characteristics_demo_button=0x7f070009;
@@ -35,12 +35,13 @@ public final class R {
         public static final int notify_demo_button=0x7f070008;
         public static final int position=0x7f070019;
         public static final int positionMap=0x7f070017;
-        public static final int radio0=0x7f07002f;
-        public static final int radio1=0x7f070030;
-        public static final int radio2=0x7f070031;
-        public static final int radioGroup1=0x7f07002e;
-        public static final int refresh=0x7f070033;
+        public static final int radio0=0x7f070035;
+        public static final int radio1=0x7f070036;
+        public static final int radio2=0x7f070037;
+        public static final int radioGroup1=0x7f070034;
+        public static final int refresh=0x7f07003a;
         public static final int root=0x7f070013;
+        public static final int saveStatsBtn=0x7f070038;
         public static final int sensorFusion_Button=0x7f07000c;
         public static final int sensorTest_Button=0x7f07000b;
         public static final int sonar=0x7f070014;
@@ -52,6 +53,8 @@ public final class R {
         public static final int tableRow4=0x7f070025;
         public static final int tableRow5=0x7f070028;
         public static final int tableRow6=0x7f07002b;
+        public static final int tableRow7=0x7f07002e;
+        public static final int tableRow8=0x7f070031;
         public static final int textView1=0x7f07001d;
         public static final int textView2=0x7f070020;
         public static final int textView3=0x7f070023;
@@ -64,6 +67,10 @@ public final class R {
         public static final int textViewLAYValue=0x7f07002a;
         public static final int textViewLAZ=0x7f07002c;
         public static final int textViewLAZValue=0x7f07002d;
+        public static final int textViewSpeedX=0x7f07002f;
+        public static final int textViewSpeedXValue=0x7f070030;
+        public static final int textViewSpeedY=0x7f070032;
+        public static final int textViewSpeedYValue=0x7f070033;
         public static final int tvCompass=0x7f070000;
         public static final int tvDistX=0x7f070003;
         public static final int tvDistY=0x7f070004;

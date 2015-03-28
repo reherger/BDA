@@ -130,10 +130,50 @@
                 android:id="@+id/textViewLAZ"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Accel in z: " />
+                android:text="Accel in z (device coord.): " />
 
             <TextView
                 android:id="@+id/textViewLAZValue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10px"
+                android:text="0"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        </TableRow>
+        <TableRow
+            android:id="@+id/tableRow7"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+
+            <TextView
+                android:id="@+id/textViewSpeedX"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Velocity in x: " />
+
+            <TextView
+                android:id="@+id/textViewSpeedXValue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10px"
+                android:text="0"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        </TableRow>
+        <TableRow
+            android:id="@+id/tableRow8"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+
+            <TextView
+                android:id="@+id/textViewSpeedY"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Velocity in y: " />
+
+            <TextView
+                android:id="@+id/textViewSpeedYValue"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10px"
@@ -167,5 +207,12 @@
             android:layout_height="wrap_content"
             android:text="Orientation from Sensor Fusion" />
     </RadioGroup>
+
+    <Button
+        android:id="@+id/saveStatsBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="Save Real World Acceleration"/>
 
 </LinearLayout>

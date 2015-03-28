@@ -31,9 +31,15 @@ import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.FloatMath;
+import android.view.View;
+import android.widget.Button;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.Timer;
@@ -64,8 +70,14 @@ implements SensorEventListener, RadioGroup.OnCheckedChangeListener {
     // linear accelertometer vector;
     private float[] linearAccel = new float[3];
 
-    // world linear acceleration vector
+    // world linear acceleration / velocity / position / vector
     private float[] worldLinearAccel = new float[3];
+    private float[] temp = new float[2];
+    private float[] speed = new float[2];
+    private float[] position = new float[2];
+    private int noMovementXCount = 0;
+    private int noMovementYCount = 0;
+
  
     // orientation angles from accel and magnet
     private float[] accMagOrientation = new float[3];
@@ -79,6 +91,7 @@ implements SensorEventListener, RadioGroup.OnCheckedChangeListener {
     public static final float EPSILON = 0.000000001f;
     private static final float NS2S = 1.0f / 1000000000.0f;
 	private float timestamp;
+    private float timestampAccel;
 
     // Constants for the low-pass accelerometer filter
     private static final float ALPHA = 0.15f;
@@ -98,8 +111,14 @@ implements SensorEventListener, RadioGroup.OnCheckedChangeListener {
     private TextView mLinAccX;
     private TextView mLinAccY;
     private TextView mLinAccZ;
+    private TextView mSpeedX;
+    private TextView mSpeedY;
 	private int radioSelection;
 	DecimalFormat d = new DecimalFormat("#.##");
+
+    // Acceleration Strings for Logging
+    private static StringBuilder sbX = new StringBuilder(10000000);
+    private static StringBuilder sbY = new StringBuilder(10000000);
 	
 	
     @Override
@@ -138,8 +157,39 @@ implements SensorEventListener, RadioGroup.OnCheckedChangeListener {
         mLinAccX = (TextView)findViewById(R.id.textViewLAXValue);
         mLinAccY = (TextView)findViewById(R.id.textViewLAYValue);
         mLinAccZ = (TextView)findViewById((R.id.textViewLAZValue));
+        mSpeedX = (TextView)findViewById(R.id.textViewSpeedXValue);
+        mSpeedY = (TextView)findViewById(R.id.textViewSpeedYValue);
 
         mRadioGroup.setOnCheckedChangeListener(this);
+
+        final Button button = (Button) findViewById(R.id.saveStatsBtn);
+        button.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                try{
+
+                    File myFile = new File("/sdcard/realWorldAccel.txt");
+                    myFile.createNewFile();
+
+                    FileOutputStream fOut = new FileOutputStream(myFile);
+                    OutputStreamWriter myOutputWriter = new OutputStreamWriter(fOut);
+
+                    myOutputWriter.append("Accelerometer Daten in Real World Coordinates");
+                    myOutputWriter.append("\r\n");
+                    myOutputWriter.append("X Directed Acceleration");
+                    myOutputWriter.append("\r\n");
+                    myOutputWriter.append(sbX.toString());
+                    myOutputWriter.append("\r\n");
+                    myOutputWriter.append("Y Directed Acceleration");
+                    myOutputWriter.append("\r\n");
+                    myOutputWriter.append(sbY.toString());
+
+                    Toast.makeText(getBaseContext(), "Done writing Data", Toast.LENGTH_SHORT).show();
+                }catch (Exception e){
+                    Toast.makeText(getBaseContext(), "TEST" + e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        });
     }
     
     @Override
@@ -198,7 +248,6 @@ implements SensorEventListener, RadioGroup.OnCheckedChangeListener {
 	    case Sensor.TYPE_GYROSCOPE:
 	        // process gyro data
 	        gyroFunction(event);
-            //calcAccelInWorlCoordinates();
 	        break;
 	 
 	    case Sensor.TYPE_MAGNETIC_FIELD:
@@ -208,7 +257,7 @@ implements SensorEventListener, RadioGroup.OnCheckedChangeListener {
 
         case Sensor.TYPE_LINEAR_ACCELERATION:
             System.arraycopy(event.values, 0, linearAccel, 0, 3);
-            accelerometerLowPass(event);
+            calcAccelInWorldCoordinates(event.timestamp);
 	    }
 	}
 	
@@ -396,11 +445,10 @@ implements SensorEventListener, RadioGroup.OnCheckedChangeListener {
             }
      
             // overwrite gyro matrix and orientation with fused orientation
-            // to comensate gyro drift
+            // to compensate gyro drift
             gyroMatrix = getRotationMatrixFromOrientation(fusedOrientation);
             System.arraycopy(fusedOrientation, 0, gyroOrientation, 0, 3);
-            
-            
+
             // update sensor output in GUI
             mHandler.post(updateOreintationDisplayTask);
         }
@@ -413,16 +461,58 @@ implements SensorEventListener, RadioGroup.OnCheckedChangeListener {
         }
     }
 
-    public void calcAccelInWorlCoordinates(){
-        float[] rotationX = new float[2];
-        float[] rotationY = new float[2];
-        rotationX[0] = FloatMath.cos(fusedOrientation[0]);
-        rotationX[1] = -FloatMath.sin(fusedOrientation[0]);
-        rotationY[0] = FloatMath.sin(fusedOrientation[1]);
-        rotationY[1] = FloatMath.cos(fusedOrientation[1]);
+    public void calcAccelInWorldCoordinates(long time){
 
-        worldLinearAccel[0] = rotationX[0]*linearAccel[0]+rotationX[1]*linearAccel[0];
-        worldLinearAccel[1] = rotationY[0]*linearAccel[1]+rotationY[1]*linearAccel[1];
+        worldLinearAccel[0] =(float) (linearAccel[0]*(Math.cos(fusedOrientation[2])*Math.cos(fusedOrientation[0])
+                +Math.sin(fusedOrientation[2])*Math.sin(fusedOrientation[1])*Math.sin(fusedOrientation[0]))
+                + linearAccel[1]*(Math.cos(fusedOrientation[1])*Math.sin(fusedOrientation[0]))
+                + linearAccel[2]*(-Math.sin(fusedOrientation[2])*Math.cos(fusedOrientation[0])
+                +Math.cos(fusedOrientation[2])*Math.sin(fusedOrientation[1])*Math.sin(fusedOrientation[0])));
+        worldLinearAccel[1] = (float) (linearAccel[0]*(-Math.cos(fusedOrientation[2])*Math.sin(fusedOrientation[0])
+                +Math.sin(fusedOrientation[2])*Math.sin(fusedOrientation[1])*Math.cos(fusedOrientation[0]))
+                + linearAccel[1]*(Math.cos(fusedOrientation[1])*Math.cos(fusedOrientation[0]))
+                + linearAccel[2]*(Math.sin(fusedOrientation[2])*Math.sin(fusedOrientation[0])
+                + Math.cos(fusedOrientation[2])*Math.sin(fusedOrientation[1])*Math.cos(fusedOrientation[0])));
+
+        //sbX.append(worldLinearAccel[0]+";");
+        //sbY.append(worldLinearAccel[1]+";");
+
+        if(timestampAccel != 0) {
+            final float dTAccel = (time - timestampAccel) * NS2S;
+
+            temp[0] = worldLinearAccel[0]*dTAccel;
+            temp[1] = worldLinearAccel[1]*dTAccel;
+
+            // ignore small acceleration
+            if(worldLinearAccel[0]>0.15){
+                speed[0] += temp[0];
+                noMovementXCount = 0;
+            }else {
+                noMovementXCount++;
+                // too long no movement -> reset speed
+                if(noMovementXCount > 20) {
+                    speed[0] = 0;
+                    noMovementXCount = 0;
+                }
+            }
+            if(worldLinearAccel[1]>0.15){
+                speed[1] += temp[1];
+                noMovementYCount = 0;
+            }else {
+                noMovementYCount++;
+                // too long no movement -> reset speed
+                if(noMovementYCount > 20){
+                    speed[1] = 0;
+                    noMovementYCount = 0;
+                }
+            }
+            // set current timestamp to old timestamp
+            timestampAccel = time;
+        }else{
+            // ignore first event
+            timestampAccel = time;
+        }
+
     }
 
     // **************************** GUI FUNCTIONS *********************************
@@ -448,25 +538,31 @@ implements SensorEventListener, RadioGroup.OnCheckedChangeListener {
     		mAzimuthView.setText(d.format(accMagOrientation[0] * 180/Math.PI) + '°');
             mPitchView.setText(d.format(accMagOrientation[1] * 180/Math.PI) + '°');
             mRollView.setText(d.format(accMagOrientation[2] * 180/Math.PI) + '°');
-            mLinAccX.setText(d.format(linearAccel[0]) + 'm'+'/'+'s'+'^'+'2');
-            mLinAccY.setText(d.format(linearAccel[1]) + 'm'+'/'+'s'+'^'+'2');
+            mLinAccX.setText(d.format(worldLinearAccel[0]) + 'm'+'/'+'s'+'^'+'2');
+            mLinAccY.setText(d.format(worldLinearAccel[1]) + 'm'+'/'+'s'+'^'+'2');
             mLinAccZ.setText(d.format(linearAccel[2]) + 'm'+'/'+'s'+'^'+'2');
+            mSpeedX.setText(d.format(speed[0]) + 'm'+'/'+'s');
+            mSpeedY.setText(d.format(speed[1]) + 'm'+'/'+'s');
     		break;
     	case 1:
     		mAzimuthView.setText(d.format(gyroOrientation[0] * 180/Math.PI) + '°');
             mPitchView.setText(d.format(gyroOrientation[1] * 180/Math.PI) + '°');
             mRollView.setText(d.format(gyroOrientation[2] * 180/Math.PI) + '°');
-            mLinAccX.setText(d.format(linearAccel[0]) + 'm'+'/'+'s'+'^'+'2');
-            mLinAccY.setText(d.format(linearAccel[1]) + 'm'+'/'+'s'+'^'+'2');
+            mLinAccX.setText(d.format(worldLinearAccel[0]) + 'm'+'/'+'s'+'^'+'2');
+            mLinAccY.setText(d.format(worldLinearAccel[1]) + 'm'+'/'+'s'+'^'+'2');
             mLinAccZ.setText(d.format(linearAccel[2]) + 'm'+'/'+'s'+'^'+'2');
+            mSpeedX.setText(d.format(speed[0]) + 'm'+'/'+'s');
+            mSpeedY.setText(d.format(speed[1]) + 'm'+'/'+'s');
     		break;
     	case 2:
     		mAzimuthView.setText(d.format(fusedOrientation[0] * 180/Math.PI) + '°');
             mPitchView.setText(d.format(fusedOrientation[1] * 180/Math.PI) + '°');
             mRollView.setText(d.format(fusedOrientation[2] * 180/Math.PI) + '°');
-            mLinAccX.setText(d.format(linearAccel[0]) + 'm'+'/'+'s'+'^'+'2');
-            mLinAccY.setText(d.format(linearAccel[1]) + 'm'+'/'+'s'+'^'+'2');
+            mLinAccX.setText(d.format(worldLinearAccel[0]) + 'm'+'/'+'s'+'^'+'2');
+            mLinAccY.setText(d.format(worldLinearAccel[1]) + 'm'+'/'+'s'+'^'+'2');
             mLinAccZ.setText(d.format(linearAccel[2]) + 'm'+'/'+'s'+'^'+'2');
+            mSpeedX.setText(d.format(speed[0]) + 'm'+'/'+'s');
+            mSpeedY.setText(d.format(speed[1]) + 'm'+'/'+'s');
     		break;
     	}
     }
