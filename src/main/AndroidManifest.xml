@@ -17,8 +17,7 @@
         android:name="android.hardware.bluetooth_le"
         android:required="true" />
 
-    <android:uses-permission
-        android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <android:uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <android:uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <android:uses-permission
         android:name="android.permission.READ_EXTERNAL_STORAGE"
@@ -67,11 +66,16 @@
         <activity
             android:name="ch.hslu.herger.sensor.LinearAccelerationActivity"
             android:label="@string/title_activity_linear_acceleration" >
+
             <!-- android:theme="@android:style/Theme.NoDisplay"> -->
         </activity>
         <activity
             android:name="ch.hslu.herger.sensor.SensorFusionActivity"
             android:label="@string/title_activity_sensor_fusion" >
+        </activity>
+        <activity
+            android:name="ch.hslu.herger.sensor.StepDetector"
+            android:label="@string/title_activity_step_detector" >
         </activity>
     </application>
 

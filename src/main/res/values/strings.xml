@@ -6,5 +6,6 @@
     <string name="title_activity_git_push_test">gitPushTest</string>
     <string name="title_activity_linear_acceleration">LinearAccelerationActivity</string>
     <string name="title_activity_sensor_fusion">SensorFusion</string>
+    <string name="title_activity_step_detector">StepDetector</string>
 
 </resources>

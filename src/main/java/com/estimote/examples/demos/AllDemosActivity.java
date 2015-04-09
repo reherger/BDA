@@ -14,6 +14,7 @@ import ch.hslu.herger.config.Configuration;
 import ch.hslu.herger.config.LocationReader;
 import ch.hslu.herger.sensor.LinearAccelerationActivity;
 import ch.hslu.herger.sensor.SensorFusionActivity;
+import ch.hslu.herger.sensor.StepDetector;
 
 /**
  * Shows all available demos.
@@ -78,6 +79,14 @@ public class AllDemosActivity extends Activity {
           public void onClick(View v) {
               Intent intent = new Intent(AllDemosActivity.this, LinearAccelerationActivity.class);
               intent.putExtra(BeaconScannerActivity.EXTRAS_TARGET_ACTIVITY, InsActivity.class.getName());
+              startActivity(intent);
+          }
+      });
+
+      findViewById(R.id.stepCounter_Button).setOnClickListener(new View.OnClickListener() {
+          @Override
+          public void onClick(View v) {
+              Intent intent = new Intent(AllDemosActivity.this, StepDetector.class);
               startActivity(intent);
           }
       });

@@ -42,6 +42,12 @@
       android:text="Sensor Fusion"/>
 
   <Button
+      android:id="@+id/stepCounter_Button"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:text="Step Counter"/>
+
+  <Button
       android:id="@+id/XMLReader_button"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
