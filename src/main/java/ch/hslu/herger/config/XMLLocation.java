@@ -10,6 +10,7 @@ public class XMLLocation {
     private String name;
     private String pathToMap;
     private List<XMLBeacon> beaconList;
+    private String angleToNorth;
 
     public String getId() {
         return id;
@@ -34,5 +35,13 @@ public class XMLLocation {
     }
     public void setBeaconList(List<XMLBeacon> beaconList) {
         this.beaconList = beaconList;
+    }
+
+    public String getAngleToNorth() {
+        return angleToNorth;
+    }
+
+    public void setAngleToNorth(String angleToNorth) {
+        this.angleToNorth = angleToNorth;
     }
 }

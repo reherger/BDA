@@ -25,6 +25,7 @@ public class LocationReader {
         "<id>1</id>"+
         "<name>HSLU</name>"+
         "<pathToMap>hslu.jpg</pathToMap>"+
+        "<angleToNorth>10</angleToNorth>"+
         "<beaconList>"+
             // blue
             "<beacon>"+
@@ -116,6 +117,9 @@ public class LocationReader {
         }else if(name.equalsIgnoreCase("pathToMap")){
             xpp.next();
             location.setPathToMap(xpp.getText());
+        }else if(name.equalsIgnoreCase("angleToNorth")){
+            xpp.next();
+            location.setAngleToNorth(xpp.getText());
         }else if(name.equalsIgnoreCase("beaconList")){
             beaconList = new ArrayList<XMLBeacon>();
         }else if(name.equalsIgnoreCase("beacon")){
