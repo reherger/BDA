@@ -43,6 +43,7 @@ public class LocationReader {
                 "<yPos>75</yPos>"+
             "</beacon>"+
             // lightBlue
+            // test
             "<beacon>"+
             "<uuid>02</uuid>"+
             "<major>112</major>"+
