@@ -44,7 +44,7 @@ import java.text.DecimalFormat;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import com.estimote.examples.demos.R;
+import ch.hslu.herger.main.R;
 
 public class SensorFusionActivity extends Activity
 implements SensorEventListener, RadioGroup.OnCheckedChangeListener {
@@ -554,8 +554,8 @@ implements SensorEventListener, RadioGroup.OnCheckedChangeListener {
             mLinAccZ.setText(d.format(linearAccel[2]) + 'm'+'/'+'s'+'^'+'2');
             mSpeedX.setText(d.format(speed[0]) + 'm'+'/'+'s');
             mSpeedY.setText(d.format(speed[1]) + 'm'+'/'+'s');
-            mDistX.setText(String.valueOf(distance[0]) + 'm');
-            mDistY.setText(String.valueOf(distance[1]) + 'm');
+            mDistX.setText(d.format(distance[0]) + 'm');
+            mDistY.setText(d.format(distance[1]) + 'm');
     		break;
     	case 1:
     		mAzimuthView.setText(d.format(gyroOrientation[0] * 180/Math.PI) + '°');
@@ -566,8 +566,8 @@ implements SensorEventListener, RadioGroup.OnCheckedChangeListener {
             mLinAccZ.setText(d.format(linearAccel[2]) + 'm'+'/'+'s'+'^'+'2');
             mSpeedX.setText(d.format(speed[0]) + 'm'+'/'+'s');
             mSpeedY.setText(d.format(speed[1]) + 'm'+'/'+'s');
-            mDistX.setText(String.valueOf(distance[0]) + 'm');
-            mDistY.setText(String.valueOf(distance[1]) + 'm');
+            mDistX.setText(d.format(distance[0]) + 'm');
+            mDistY.setText(d.format(distance[1]) + 'm');
     		break;
     	case 2:
     		mAzimuthView.setText(d.format(fusedOrientation[0] * 180/Math.PI) + '°');
@@ -578,8 +578,8 @@ implements SensorEventListener, RadioGroup.OnCheckedChangeListener {
             mLinAccZ.setText(d.format(linearAccel[2]) + 'm'+'/'+'s'+'^'+'2');
             mSpeedX.setText(d.format(speed[0]) + 'm'+'/'+'s');
             mSpeedY.setText(d.format(speed[1]) + 'm'+'/'+'s');
-            mDistX.setText(String.valueOf(distance[0]) + 'm');
-            mDistY.setText(String.valueOf(distance[1]) + 'm');
+            mDistX.setText(d.format(distance[0]) + 'm');
+            mDistY.setText(d.format(distance[1]) + 'm');
     		break;
     	}
     }

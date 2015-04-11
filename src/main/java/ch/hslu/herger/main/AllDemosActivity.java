@@ -1,10 +1,12 @@
-package com.estimote.examples.demos;
+package ch.hslu.herger.main;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
+
+import ch.hslu.herger.main.R;
 
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -32,30 +34,6 @@ public class AllDemosActivity extends Activity {
     // Read configuration file
     setConfiguration();
 
-    findViewById(R.id.distance_demo_button).setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        Intent intent = new Intent(AllDemosActivity.this, ListBeaconsActivity.class);
-        intent.putExtra(ListBeaconsActivity.EXTRAS_TARGET_ACTIVITY, DistanceBeaconActivity.class.getName());
-        startActivity(intent);
-      }
-    });
-    findViewById(R.id.notify_demo_button).setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        Intent intent = new Intent(AllDemosActivity.this, ListBeaconsActivity.class);
-        intent.putExtra(ListBeaconsActivity.EXTRAS_TARGET_ACTIVITY, NotifyDemoActivity.class.getName());
-        startActivity(intent);
-      }
-    });
-    findViewById(R.id.characteristics_demo_button).setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        Intent intent = new Intent(AllDemosActivity.this, ListBeaconsActivity.class);
-        intent.putExtra(ListBeaconsActivity.EXTRAS_TARGET_ACTIVITY, CharacteristicsDemoActivity.class.getName());
-        startActivity(intent);
-      }
-    });
     findViewById(R.id.ins_button).setOnClickListener(new View.OnClickListener() {
         @Override
         public void onClick(View v) {

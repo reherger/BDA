@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.estimote.examples.demos"
+    package="ch.hslu.herger.main"
     android:versionCode="1"
     android:versionName="1.0" >
 
@@ -28,30 +28,17 @@
         android:label="Estimote Demos"
         android:theme="@android:style/Theme.Holo.Light" >
         <activity
-            android:name=".AllDemosActivity"
+            android:name="ch.hslu.herger.main.AllDemosActivity"
             android:label="Estimote Demos"
             android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
-            android:name=".BeaconScannerActivity"
+            android:name="ch.hslu.herger.main.BeaconScannerActivity"
             android:label="Select Beacon"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".DistanceBeaconActivity"
-            android:label="Distance Demo"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".NotifyDemoActivity"
-            android:label="Notify Demo"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".CharacteristicsDemoActivity"
-            android:label="Characteristics Demo"
             android:screenOrientation="portrait" />
 
         <!-- Estimote service responsible for scanning beacons. -->
@@ -60,7 +47,7 @@
             android:exported="false" />
 
         <activity
-            android:name=".InsActivity"
+            android:name="ch.hslu.herger.main.InsActivity"
             android:label="@string/title_activity_ins" >
         </activity>
         <activity

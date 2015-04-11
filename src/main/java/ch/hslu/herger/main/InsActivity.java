@@ -1,4 +1,4 @@
-package com.estimote.examples.demos;
+package ch.hslu.herger.main;
 
 import android.app.Activity;
 import android.app.Notification;
@@ -10,8 +10,8 @@ import android.os.Bundle;
 import android.os.RemoteException;
 import android.util.Log;
 import android.view.MenuItem;
-import android.widget.TextView;
 
+import ch.hslu.herger.main.R;
 import com.estimote.sdk.Beacon;
 import com.estimote.sdk.BeaconManager;
 import com.estimote.sdk.Region;

@@ -12,7 +12,7 @@ import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.estimote.examples.demos.R;
+import ch.hslu.herger.main.R;
 
 import org.w3c.dom.Text;
 

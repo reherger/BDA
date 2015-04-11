@@ -1,9 +1,8 @@
-package com.estimote.examples.demos;
+package ch.hslu.herger.main;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
-import android.graphics.Canvas;
 import android.os.Bundle;
 import android.os.RemoteException;
 import android.util.DisplayMetrics;
@@ -16,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import ch.hslu.herger.main.R;
 import com.estimote.sdk.Beacon;
 import com.estimote.sdk.BeaconManager;
 import com.estimote.sdk.Region;
@@ -26,7 +26,6 @@ import java.util.List;
 
 import ch.hslu.herger.beacon.BeaconComparator;
 import ch.hslu.herger.config.Configuration;
-import ch.hslu.herger.config.LocationReader;
 import ch.hslu.herger.config.XMLBeacon;
 import ch.hslu.herger.config.XMLLocation;
 import ch.hslu.herger.data.DataHandler;
