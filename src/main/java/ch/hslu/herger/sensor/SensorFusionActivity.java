@@ -30,7 +30,6 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.FloatMath;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RadioGroup;
@@ -72,9 +71,10 @@ implements SensorEventListener, RadioGroup.OnCheckedChangeListener {
 
     // world linear acceleration / velocity / position / vector
     private float[] worldLinearAccel = new float[3];
-    private float[] temp = new float[2];
+    private float[] tempSpeed = new float[2];
     private float[] speed = new float[2];
-    private float[] position = new float[2];
+    private float[] tempDistance = new float[2];
+    private float[] distance = new float[2];
     private int noMovementXCount = 0;
     private int noMovementYCount = 0;
 
@@ -90,6 +90,7 @@ implements SensorEventListener, RadioGroup.OnCheckedChangeListener {
     
     public static final float EPSILON = 0.000000001f;
     private static final float NS2S = 1.0f / 1000000000.0f;
+    private static final float MS2S = 1.0f / 1000000.0f;
 	private float timestamp;
     private float timestampAccel;
 
@@ -113,14 +114,17 @@ implements SensorEventListener, RadioGroup.OnCheckedChangeListener {
     private TextView mLinAccZ;
     private TextView mSpeedX;
     private TextView mSpeedY;
+    private TextView mDistX;
+    private TextView mDistY;
 	private int radioSelection;
 	DecimalFormat d = new DecimalFormat("#.##");
 
     // Acceleration Strings for Logging
     private static StringBuilder sbX = new StringBuilder(10000000);
     private static StringBuilder sbY = new StringBuilder(10000000);
-	
-	
+
+    private float timeElapsed = 0.0f;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -159,6 +163,8 @@ implements SensorEventListener, RadioGroup.OnCheckedChangeListener {
         mLinAccZ = (TextView)findViewById((R.id.textViewLAZValue));
         mSpeedX = (TextView)findViewById(R.id.textViewSpeedXValue);
         mSpeedY = (TextView)findViewById(R.id.textViewSpeedYValue);
+        mDistX = (TextView)findViewById(R.id.textViewDistXValue);
+        mDistY = (TextView)findViewById(R.id.textViewDistYValue);
 
         mRadioGroup.setOnCheckedChangeListener(this);
 
@@ -480,28 +486,33 @@ implements SensorEventListener, RadioGroup.OnCheckedChangeListener {
         if(timestampAccel != 0) {
             final float dTAccel = (time - timestampAccel) * NS2S;
 
-            temp[0] = worldLinearAccel[0]*dTAccel;
-            temp[1] = worldLinearAccel[1]*dTAccel;
+            tempSpeed[0] = worldLinearAccel[0]*dTAccel;
+            tempSpeed[1] = worldLinearAccel[1]*dTAccel;
+
+            tempDistance[0] = speed[0]*dTAccel;
+            tempDistance[1] = speed[1]*dTAccel;
 
             // ignore small acceleration
             if(worldLinearAccel[0]>0.15){
-                speed[0] += temp[0];
+                speed[0] += tempSpeed[0];
+                distance[0] += tempDistance[0];
                 noMovementXCount = 0;
             }else {
                 noMovementXCount++;
                 // too long no movement -> reset speed
-                if(noMovementXCount > 20) {
+                if(noMovementXCount > 40) {
                     speed[0] = 0;
                     noMovementXCount = 0;
                 }
             }
             if(worldLinearAccel[1]>0.15){
-                speed[1] += temp[1];
+                speed[1] += tempSpeed[1];
+                distance[1] += tempDistance[1];
                 noMovementYCount = 0;
             }else {
                 noMovementYCount++;
                 // too long no movement -> reset speed
-                if(noMovementYCount > 20){
+                if(noMovementYCount > 40){
                     speed[1] = 0;
                     noMovementYCount = 0;
                 }
@@ -543,6 +554,8 @@ implements SensorEventListener, RadioGroup.OnCheckedChangeListener {
             mLinAccZ.setText(d.format(linearAccel[2]) + 'm'+'/'+'s'+'^'+'2');
             mSpeedX.setText(d.format(speed[0]) + 'm'+'/'+'s');
             mSpeedY.setText(d.format(speed[1]) + 'm'+'/'+'s');
+            mDistX.setText(String.valueOf(distance[0]) + 'm');
+            mDistY.setText(String.valueOf(distance[1]) + 'm');
     		break;
     	case 1:
     		mAzimuthView.setText(d.format(gyroOrientation[0] * 180/Math.PI) + '°');
@@ -553,6 +566,8 @@ implements SensorEventListener, RadioGroup.OnCheckedChangeListener {
             mLinAccZ.setText(d.format(linearAccel[2]) + 'm'+'/'+'s'+'^'+'2');
             mSpeedX.setText(d.format(speed[0]) + 'm'+'/'+'s');
             mSpeedY.setText(d.format(speed[1]) + 'm'+'/'+'s');
+            mDistX.setText(String.valueOf(distance[0]) + 'm');
+            mDistY.setText(String.valueOf(distance[1]) + 'm');
     		break;
     	case 2:
     		mAzimuthView.setText(d.format(fusedOrientation[0] * 180/Math.PI) + '°');
@@ -563,6 +578,8 @@ implements SensorEventListener, RadioGroup.OnCheckedChangeListener {
             mLinAccZ.setText(d.format(linearAccel[2]) + 'm'+'/'+'s'+'^'+'2');
             mSpeedX.setText(d.format(speed[0]) + 'm'+'/'+'s');
             mSpeedY.setText(d.format(speed[1]) + 'm'+'/'+'s');
+            mDistX.setText(String.valueOf(distance[0]) + 'm');
+            mDistY.setText(String.valueOf(distance[1]) + 'm');
     		break;
     	}
     }

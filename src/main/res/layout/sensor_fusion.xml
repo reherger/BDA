@@ -181,6 +181,46 @@
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
         </TableRow>
+        <TableRow
+            android:id="@+id/tableRow9"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+
+            <TextView
+                android:id="@+id/textViewDistX"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Distance in x: " />
+
+            <TextView
+                android:id="@+id/textViewDistXValue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10px"
+                android:text="0"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        </TableRow>
+        <TableRow
+            android:id="@+id/tableRow10"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+
+            <TextView
+                android:id="@+id/textViewDistY"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Velocity in y: " />
+
+            <TextView
+                android:id="@+id/textViewDistYValue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10px"
+                android:text="0"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        </TableRow>
     </TableLayout>
 
     <RadioGroup
