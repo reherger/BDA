@@ -44,6 +44,7 @@ import java.text.DecimalFormat;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import ch.hslu.herger.data.DataHandler;
 import ch.hslu.herger.main.R;
 
 public class SensorFusionActivity extends Activity
@@ -123,7 +124,8 @@ implements SensorEventListener, RadioGroup.OnCheckedChangeListener {
     private static StringBuilder sbX = new StringBuilder(10000000);
     private static StringBuilder sbY = new StringBuilder(10000000);
 
-    private float timeElapsed = 0.0f;
+    // dataHandler
+    private DataHandler dataHandler;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -196,6 +198,8 @@ implements SensorEventListener, RadioGroup.OnCheckedChangeListener {
 
             }
         });
+
+        dataHandler = DataHandler.getInstance();
     }
     
     @Override
@@ -524,6 +528,10 @@ implements SensorEventListener, RadioGroup.OnCheckedChangeListener {
             timestampAccel = time;
         }
 
+        dataHandler.setXDistanceSensor(distance[0]);
+        dataHandler.setYDistanceSensor(distance[1]);
+
+        System.out.println("X Distance = "+distance[0]);
     }
 
     // **************************** GUI FUNCTIONS *********************************
@@ -589,4 +597,13 @@ implements SensorEventListener, RadioGroup.OnCheckedChangeListener {
 			updateOreintationDisplay();
 		}
 	};
+
+    private void updateUI(){
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+
+            }
+        });
+    }
 }

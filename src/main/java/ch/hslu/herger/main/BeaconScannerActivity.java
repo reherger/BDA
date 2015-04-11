@@ -30,6 +30,7 @@ import ch.hslu.herger.config.XMLBeacon;
 import ch.hslu.herger.config.XMLLocation;
 import ch.hslu.herger.data.DataHandler;
 import ch.hslu.herger.sensor.LinearAccelerationActivity;
+import ch.hslu.herger.sensor.SensorFusionActivity;
 
 /**
  * Displays list of found beacons sorted by RSSI.
@@ -55,6 +56,8 @@ public class BeaconScannerActivity extends Activity {
   //private LeDeviceListAdapter adapter;
   private List<Beacon> beaconList;
   private DataHandler dataHandler;
+
+  private boolean sensorFusionStarted = false;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -107,6 +110,11 @@ public class BeaconScannerActivity extends Activity {
             if(beaconList.size()>0) {
                 XMLBeacon currentBeacon = BeaconComparator.isBeaconKnown(beaconList.get(0), locationList);
                 if(currentBeacon != null) {
+                    if(sensorFusionStarted == false) {
+                        Intent intent = new Intent(BeaconScannerActivity.this, SensorFusionActivity.class);
+                        startActivity(intent);
+                        sensorFusionStarted = true;
+                    }
 
                     positionMap.setVisibility(View.VISIBLE);
 
@@ -114,8 +122,8 @@ public class BeaconScannerActivity extends Activity {
                     position.setX(Float.parseFloat(currentBeacon.getxPos())*pxTodp);
                     position.setY(Float.parseFloat(currentBeacon.getyPos())*pxTodp);
 
-                    tvDistX.setText("Distance x: "+Math.round(dataHandler.getXDist()));
-                    tvDistY.setText("Distance y: "+Math.round(dataHandler.getYDist()));
+                    tvDistX.setText("Distance x: "+Math.round(dataHandler.getXDistanceSensor()));
+                    tvDistY.setText("Distance y: "+Math.round(dataHandler.getYDistanceSensor()));
                     tvCompass.setText("Compass: "+Float.toString(dataHandler.getCompass()));
                     tvNearestBeacon.setText("Nearest beacon: " + currentBeacon.getMajor() +"Beacon RSSI: "+beaconList.get(0).getRssi() + "Meassured Power: "+beaconList.get(0).getMeasuredPower());
                 }

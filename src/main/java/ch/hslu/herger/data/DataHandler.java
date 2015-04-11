@@ -27,6 +27,9 @@ public class DataHandler {
     private static float xAcc;
     private static float yAcc;
 
+    private static float xDistanceSensor;
+    private static float yDistanceSensor;
+
     private float compass;
 
     public static DataHandler getInstance() {
@@ -178,5 +181,21 @@ public class DataHandler {
 
     public static void setyAcc(float yAcc) {
         DataHandler.yAcc = yAcc;
+    }
+
+    public static float getXDistanceSensor() {
+        return xDistanceSensor;
+    }
+
+    public static void setXDistanceSensor(float xDistanceSensor) {
+        DataHandler.xDistanceSensor = xDistanceSensor;
+    }
+
+    public static float getYDistanceSensor() {
+        return yDistanceSensor;
+    }
+
+    public static void setYDistanceSensor(float yDistanceSensor) {
+        DataHandler.yDistanceSensor = yDistanceSensor;
     }
 }

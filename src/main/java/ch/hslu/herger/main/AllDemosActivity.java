@@ -38,7 +38,6 @@ public class AllDemosActivity extends Activity {
         @Override
         public void onClick(View v) {
             Intent intent = new Intent(AllDemosActivity.this, BeaconScannerActivity.class);
-            intent.putExtra(BeaconScannerActivity.EXTRAS_TARGET_ACTIVITY, InsActivity.class.getName());
             startActivity(intent);
         }
     });
