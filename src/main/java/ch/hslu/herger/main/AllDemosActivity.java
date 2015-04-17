@@ -39,6 +39,7 @@ public class AllDemosActivity extends Activity {
         public void onClick(View v) {
             Intent intent = new Intent(AllDemosActivity.this, BeaconScannerActivity.class);
             startActivity(intent);
+
         }
     });
 
