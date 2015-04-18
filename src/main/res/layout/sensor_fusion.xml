@@ -264,19 +264,13 @@
             android:layout_y="145dp"/>
     </AbsoluteLayout>
 
-    <AbsoluteLayout
+    <RelativeLayout
         android:id="@+id/locationWarning"
-        android:layout_width="300dp"
-        android:layout_height="400dp"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:background="@drawable/nobeaconinrange"
         android:layout_centerInParent="true">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAlignment="center"
-            android:text="No beacons detected! Please verify your position next to a beacon."
-            android:textColor="@android:color/holo_red_light"
-            android:textAppearance="?android:attr/textAppearanceLarge" />
-    </AbsoluteLayout>
+    </RelativeLayout>
 
 </RelativeLayout>

@@ -38,9 +38,11 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.AbsoluteLayout;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -68,7 +70,7 @@ import ch.hslu.herger.main.R;
 
 public class SensorFusionActivity extends Activity
 implements SensorEventListener {
-    
+
 	private SensorManager mSensorManager = null;
 	
     // angular speeds from gyro
@@ -97,6 +99,12 @@ implements SensorEventListener {
     private float[] distance = new float[2];
     private int noMovementXCount = 0;
     private int noMovementYCount = 0;
+
+    private double mapX;
+    private double mapY;
+    private double positionX;
+    private double positionY;
+
 
  
     // orientation angles from accel and magnet
@@ -141,7 +149,7 @@ implements SensorEventListener {
     private AbsoluteLayout positionMap;
     private ImageView position;
 
-    private AbsoluteLayout locationWarning;
+    private RelativeLayout locationWarning;
 
     private boolean running = false;
     private boolean inBeaconRange = false;
@@ -179,6 +187,8 @@ implements SensorEventListener {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.sensor_fusion);
+        // Keep Screen always on
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
  
         gyroOrientation[0] = 0.0f;
         gyroOrientation[1] = 0.0f;
@@ -219,7 +229,7 @@ implements SensorEventListener {
         positionMap.setVisibility(View.INVISIBLE);
         position = (ImageView) findViewById(R.id.position);
 
-        locationWarning = (AbsoluteLayout) findViewById(R.id.locationWarning);
+        locationWarning = (RelativeLayout) findViewById(R.id.locationWarning);
 
         getActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -617,32 +627,30 @@ implements SensorEventListener {
             double distYmapY = 0;
             double distXmapX = 0;
             double distXmapY = 0;
-            double mapX = 0;
-            double mapY = 0;
 
             if(angleToNorth >= 0f){
                 if(deviceDirection >= 0f){
                     diff = deviceDirection - angleToNorth;
-                    System.out.println("FALL 1");
+                    //System.out.println("FALL 1");
                 }else{
                     double tempDevice = deviceDirection + 360;
                     diff = tempDevice - angleToNorth;
-                    System.out.println("FALL 2");
+                    //System.out.println("FALL 2");
                 }
             }else{
                 if(deviceDirection >= 0f){
                     double tempNorth = angleToNorth + 360;
                     diff = deviceDirection - tempNorth;
-                    System.out.println("FALL 3");
+                    //System.out.println("FALL 3");
                 }else{
                     double tempNorth = angleToNorth + 360;
                     double tempDevice = deviceDirection + 360;
                     diff = tempDevice - tempNorth;
-                    System.out.println("FALL 4");
+                    //System.out.println("FALL 4");
 
                 }
             }
-            System.out.println("DIFF = "+diff);
+            //System.out.println("DIFF = "+diff);
 
             distYmapY = Math.cos(diff*D2RAD)*distanceY;
             distYmapX = Math.sin(diff*D2RAD)*distanceY;
@@ -657,8 +665,8 @@ implements SensorEventListener {
             mapY = distYmapY + distXmapY;
             mapX = distYmapX + distXmapX;
 
-            System.out.println("mapY = "+mapY);
-            System.out.println("mapX = "+mapX);
+            //System.out.println("mapY = "+mapY);
+            //System.out.println("mapX = "+mapX);
 
 
         }
@@ -697,12 +705,18 @@ implements SensorEventListener {
                 mCurrentBeacon.setText(currentXMLBeacon.getMajor());
                 positionMap.setVisibility(View.VISIBLE);
                 mCurrentBeacon.setVisibility(View.VISIBLE);
-                position.setX(Float.parseFloat(currentXMLBeacon.getxPos())*pxTodp);
-                position.setY(Float.parseFloat(currentXMLBeacon.getyPos())*pxTodp);
+                positionX = Float.parseFloat(currentXMLBeacon.getxPos());
+                positionY = Float.parseFloat(currentXMLBeacon.getyPos());
+                position.setX((float)positionX*pxTodp);
+                position.setY((float)positionY*pxTodp);
+                System.out.println("Position X = "+positionX);
             }else{
-                mCurrentBeacon.setText(currentXMLBeacon.getMajor());
-                position.setX(150.0f*pxTodp);
-                position.setY(50.0f*pxTodp);
+                mCurrentBeacon.setText(currentXMLBeacon.getMajor()+"not in range");
+                positionX += mapX*10;
+                positionY += mapY*10;
+                System.out.println("Position X = "+positionX);
+                position.setX((float)positionX*pxTodp);
+                position.setY((float)positionY*pxTodp);
             }
         }else{
             locationWarning.setVisibility(View.VISIBLE);
