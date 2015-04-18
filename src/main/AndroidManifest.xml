@@ -58,8 +58,7 @@
         </activity>
         <activity
             android:name="ch.hslu.herger.sensor.SensorFusionActivity"
-            android:label="@string/title_activity_sensor_fusion"
-            android:theme="@android:style/Theme.NoDisplay" >
+            android:label="@string/title_activity_sensor_fusion" >
         </activity>
         <activity
             android:name="ch.hslu.herger.sensor.StepDetector"

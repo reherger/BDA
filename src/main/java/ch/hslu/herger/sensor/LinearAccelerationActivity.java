@@ -114,18 +114,18 @@ public class LinearAccelerationActivity extends Activity implements SensorEventL
             // 0=North, 90=East, 180=South, 270=West
             float azimuth = event.values[0];
 
-            dataHandler.setCompass(azimuth);
+            //dataHandler.setCompass(azimuth);
         }
     }
 
     public void displayData(){
-        tvCompass.setText("Compass :"+dataHandler.getCompass());
-        tvSpeedX.setText("Speed X: "+Float.toString(dataHandler.getXSpeed()));
-        tvSpeedY.setText("Speed Y:"+Float.toString(dataHandler.getYSpeed()));
-        tvDistX.setText("Distance X:"+Float.toString(dataHandler.getXDist()));
-        tvDistY.setText("Distance Y:"+Float.toString(dataHandler.getYDist()));
-        tvXAcc.setText("Acceleration X: "+Float.toString(dataHandler.getxAcc()));
-        tvYAcc.setText("Acceleration Y: "+Float.toString(dataHandler.getyAcc()));
+        //tvCompass.setText("Compass :"+dataHandler.getCompass());
+        //tvSpeedX.setText("Speed X: "+Float.toString(dataHandler.getXSpeed()));
+        //tvSpeedY.setText("Speed Y:"+Float.toString(dataHandler.getYSpeed()));
+        //tvDistX.setText("Distance X:"+Float.toString(dataHandler.getXDist()));
+        //tvDistY.setText("Distance Y:"+Float.toString(dataHandler.getYDist()));
+        //tvXAcc.setText("Acceleration X: "+Float.toString(dataHandler.getxAcc()));
+        //tvYAcc.setText("Acceleration Y: "+Float.toString(dataHandler.getyAcc()));
     }
 
 }

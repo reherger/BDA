@@ -24,31 +24,50 @@
 package ch.hslu.herger.sensor;
 
 import android.app.Activity;
+import android.bluetooth.BluetoothAdapter;
+import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.RemoteException;
+import android.util.DisplayMetrics;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.AbsoluteLayout;
 import android.widget.Button;
-import android.widget.RadioGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.estimote.sdk.Beacon;
+import com.estimote.sdk.BeaconManager;
+import com.estimote.sdk.Region;
+import com.estimote.sdk.utils.L;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import ch.hslu.herger.beacon.BeaconComparator;
+import ch.hslu.herger.config.Configuration;
+import ch.hslu.herger.config.XMLBeacon;
+import ch.hslu.herger.config.XMLLocation;
 import ch.hslu.herger.data.DataHandler;
 import ch.hslu.herger.main.R;
 
 public class SensorFusionActivity extends Activity
-implements SensorEventListener, RadioGroup.OnCheckedChangeListener {
+implements SensorEventListener {
     
 	private SensorManager mSensorManager = null;
 	
@@ -85,13 +104,14 @@ implements SensorEventListener, RadioGroup.OnCheckedChangeListener {
  
     // final orientation angles from sensor fusion
     private float[] fusedOrientation = new float[3];
- 
+
     // accelerometer and magnetometer based rotation matrix
     private float[] rotationMatrix = new float[9];
     
     public static final float EPSILON = 0.000000001f;
     private static final float NS2S = 1.0f / 1000000000.0f;
     private static final float MS2S = 1.0f / 1000000.0f;
+    private static final double D2RAD = (2*Math.PI/360);
 	private float timestamp;
     private float timestampAccel;
 
@@ -106,7 +126,6 @@ implements SensorEventListener, RadioGroup.OnCheckedChangeListener {
 	
 	// The following members are only for displaying the sensor output.
 	public Handler mHandler;
-	private RadioGroup mRadioGroup;
 	private TextView mAzimuthView;
 	private TextView mPitchView;
 	private TextView mRollView;
@@ -117,7 +136,17 @@ implements SensorEventListener, RadioGroup.OnCheckedChangeListener {
     private TextView mSpeedY;
     private TextView mDistX;
     private TextView mDistY;
-	private int radioSelection;
+    private TextView mCurrentBeacon;
+
+    private AbsoluteLayout positionMap;
+    private ImageView position;
+
+    private AbsoluteLayout locationWarning;
+
+    private boolean running = false;
+    private boolean inBeaconRange = false;
+
+
 	DecimalFormat d = new DecimalFormat("#.##");
 
     // Acceleration Strings for Logging
@@ -126,6 +155,25 @@ implements SensorEventListener, RadioGroup.OnCheckedChangeListener {
 
     // dataHandler
     private DataHandler dataHandler;
+
+    private static final String TAG = SensorFusionActivity.class.getSimpleName();
+
+    public static final String EXTRAS_TARGET_ACTIVITY = "extrasTargetActivity";
+    public static final String EXTRAS_BEACON = "extrasBeacon";
+
+    private static final int REQUEST_ENABLE_BT = 1234;
+    private static final Region ALL_ESTIMOTE_BEACONS_REGION = new Region("rid", null, null, null);
+
+    // Constant for converting Px to Dp
+    private DisplayMetrics metrics;
+    private float pxTodp;
+
+    private BeaconManager beaconManager;
+    private List<Beacon> beaconList;
+    private Beacon currentBeacon;
+    private XMLBeacon currentXMLBeacon;
+
+    private static XMLLocation currentLocation;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -152,11 +200,9 @@ implements SensorEventListener, RadioGroup.OnCheckedChangeListener {
         
         // GUI stuff
         mHandler = new Handler();
-        radioSelection = 0;
         d.setRoundingMode(RoundingMode.HALF_UP);
         d.setMaximumFractionDigits(3);
         d.setMinimumFractionDigits(3);
-        mRadioGroup = (RadioGroup)findViewById(R.id.radioGroup1);
         mAzimuthView = (TextView)findViewById(R.id.textView4);
         mPitchView = (TextView)findViewById(R.id.textView5);
         mRollView = (TextView)findViewById(R.id.textView6);
@@ -167,39 +213,60 @@ implements SensorEventListener, RadioGroup.OnCheckedChangeListener {
         mSpeedY = (TextView)findViewById(R.id.textViewSpeedYValue);
         mDistX = (TextView)findViewById(R.id.textViewDistXValue);
         mDistY = (TextView)findViewById(R.id.textViewDistYValue);
+        mCurrentBeacon = (TextView)findViewById(R.id.textViewCurrentBeaconValue);
 
-        mRadioGroup.setOnCheckedChangeListener(this);
+        positionMap = (AbsoluteLayout) findViewById(R.id.positionMap);
+        positionMap.setVisibility(View.INVISIBLE);
+        position = (ImageView) findViewById(R.id.position);
 
-        final Button button = (Button) findViewById(R.id.saveStatsBtn);
-        button.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                try{
+        locationWarning = (AbsoluteLayout) findViewById(R.id.locationWarning);
 
-                    File myFile = new File("/sdcard/realWorldAccel.txt");
-                    myFile.createNewFile();
+        getActionBar().setDisplayHomeAsUpEnabled(true);
 
-                    FileOutputStream fOut = new FileOutputStream(myFile);
-                    OutputStreamWriter myOutputWriter = new OutputStreamWriter(fOut);
+        // Set Display Metrics
+        metrics = getApplicationContext().getResources().getDisplayMetrics();
+        pxTodp = metrics.density;
 
-                    myOutputWriter.append("Accelerometer Daten in Real World Coordinates");
-                    myOutputWriter.append("\r\n");
-                    myOutputWriter.append("X Directed Acceleration");
-                    myOutputWriter.append("\r\n");
-                    myOutputWriter.append(sbX.toString());
-                    myOutputWriter.append("\r\n");
-                    myOutputWriter.append("Y Directed Acceleration");
-                    myOutputWriter.append("\r\n");
-                    myOutputWriter.append(sbY.toString());
+        // Initialize DataHandler
+        dataHandler = DataHandler.getInstance();
 
-                    Toast.makeText(getBaseContext(), "Done writing Data", Toast.LENGTH_SHORT).show();
-                }catch (Exception e){
-                    Toast.makeText(getBaseContext(), "TEST" + e.getMessage(), Toast.LENGTH_SHORT).show();
+        // Configure verbose debug logging.
+        L.enableDebugLogging(true);
+
+        // Read Configuration
+        final List<XMLLocation> locationList = ((Configuration) this.getApplication()).getLocationList();
+
+        // Configure BeaconManager.
+        beaconManager = new BeaconManager(this);
+        beaconManager.setRangingListener(new BeaconManager.RangingListener() {
+            @Override
+            public void onBeaconsDiscovered(final Region region, final List<Beacon> beacons) {
+
+                beaconList = beacons;
+
+                if(beaconList.size()>0) {
+                    currentBeacon = beaconList.get(0);
+                    currentXMLBeacon = isBeaconKnown(currentBeacon, locationList);
+                    if (currentXMLBeacon != null) {
+                        if(isBeaconInRange(currentBeacon)){
+                            running = true;
+                            inBeaconRange = true;
+                        }else{
+                            inBeaconRange = false;
+                        }
+                        System.out.println("BEACON = " + currentXMLBeacon.getMajor());
+
+                    }else
+                        running = false;
+                }else{
+                    currentBeacon = null;
+                    currentXMLBeacon = null;
+                    running = false;
+                    inBeaconRange = false;
                 }
 
             }
         });
-
-        dataHandler = DataHandler.getInstance();
     }
     
     @Override
@@ -207,6 +274,12 @@ implements SensorEventListener, RadioGroup.OnCheckedChangeListener {
     	super.onStop();
     	// unregister sensor listeners to prevent the activity from draining the device's battery.
     	mSensorManager.unregisterListener(this);
+
+        try {
+            beaconManager.stopRanging(ALL_ESTIMOTE_BEACONS_REGION);
+        } catch (RemoteException e) {
+            Log.d(TAG, "Error while stopping ranging", e);
+        }
     }
 	
     @Override
@@ -220,7 +293,8 @@ implements SensorEventListener, RadioGroup.OnCheckedChangeListener {
     public void onResume() {
     	super.onResume();
     	// restore the sensor listeners when user resumes the application.
-    	initListeners();
+    	// TODO init listeners after Beacon detected
+        initListeners();
     }
     
     // This function registers sensor listeners for the accelerometer, magnetometer and gyroscope.
@@ -240,6 +314,7 @@ implements SensorEventListener, RadioGroup.OnCheckedChangeListener {
         mSensorManager.registerListener(this,
             mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION),
             SensorManager.SENSOR_DELAY_FASTEST);
+
     }
 
 	@Override
@@ -249,26 +324,27 @@ implements SensorEventListener, RadioGroup.OnCheckedChangeListener {
 	@Override
 	public void onSensorChanged(SensorEvent event) {
 		switch(event.sensor.getType()) {
-	    case Sensor.TYPE_ACCELEROMETER:
-	        // copy new accelerometer data into accel array and calculate orientation
-	        System.arraycopy(event.values, 0, accel, 0, 3);
-	        calculateAccMagOrientation();
-	        break;
-	 
-	    case Sensor.TYPE_GYROSCOPE:
-	        // process gyro data
-	        gyroFunction(event);
-	        break;
-	 
-	    case Sensor.TYPE_MAGNETIC_FIELD:
-	        // copy new magnetometer data into magnet array
-	        System.arraycopy(event.values, 0, magnet, 0, 3);
-	        break;
+            case Sensor.TYPE_ACCELEROMETER:
+                // copy new accelerometer data into accel array and calculate orientation
+                System.arraycopy(event.values, 0, accel, 0, 3);
+                calculateAccMagOrientation();
+                break;
 
-        case Sensor.TYPE_LINEAR_ACCELERATION:
-            System.arraycopy(event.values, 0, linearAccel, 0, 3);
-            calcAccelInWorldCoordinates(event.timestamp);
-	    }
+            case Sensor.TYPE_GYROSCOPE:
+                // process gyro data
+                gyroFunction(event);
+                break;
+
+            case Sensor.TYPE_MAGNETIC_FIELD:
+                // copy new magnetometer data into magnet array
+                System.arraycopy(event.values, 0, magnet, 0, 3);
+                break;
+
+            case Sensor.TYPE_LINEAR_ACCELERATION:
+                System.arraycopy(event.values, 0, linearAccel, 0, 3);
+                calcAccelInWorldCoordinates(event.timestamp);
+                break;
+        }
 	}
 	
 	// calculates orientation angles from accelerometer and magnetometer output
@@ -460,7 +536,7 @@ implements SensorEventListener, RadioGroup.OnCheckedChangeListener {
             System.arraycopy(fusedOrientation, 0, gyroOrientation, 0, 3);
 
             // update sensor output in GUI
-            mHandler.post(updateOreintationDisplayTask);
+            // mHandler.post(updateOreintationDisplayTask);
         }
     }
 
@@ -499,7 +575,7 @@ implements SensorEventListener, RadioGroup.OnCheckedChangeListener {
             // ignore small acceleration
             if(worldLinearAccel[0]>0.15){
                 speed[0] += tempSpeed[0];
-                distance[0] += tempDistance[0];
+                distance[0] = tempDistance[0];
                 noMovementXCount = 0;
             }else {
                 noMovementXCount++;
@@ -511,7 +587,7 @@ implements SensorEventListener, RadioGroup.OnCheckedChangeListener {
             }
             if(worldLinearAccel[1]>0.15){
                 speed[1] += tempSpeed[1];
-                distance[1] += tempDistance[1];
+                distance[1] = tempDistance[1];
                 noMovementYCount = 0;
             }else {
                 noMovementYCount++;
@@ -528,57 +604,86 @@ implements SensorEventListener, RadioGroup.OnCheckedChangeListener {
             timestampAccel = time;
         }
 
-        dataHandler.setXDistanceSensor(distance[0]);
-        dataHandler.setYDistanceSensor(distance[1]);
+        // TODO calculate XY DIRECTION ON MAP
+        if(currentLocation != null) {
+            float angleToNorth = Float.valueOf(currentLocation.getAngleToNorth());
+            double deviceDirection = fusedOrientation[0]* 180/Math.PI;
+            float distanceX = distance[0];
+            float distanceY = distance[1];
 
-        System.out.println("X Distance = "+distance[0]);
+            double diff = 0;
+
+            double distYmapX = 0;
+            double distYmapY = 0;
+            double distXmapX = 0;
+            double distXmapY = 0;
+            double mapX = 0;
+            double mapY = 0;
+
+            if(angleToNorth >= 0f){
+                if(deviceDirection >= 0f){
+                    diff = deviceDirection - angleToNorth;
+                    System.out.println("FALL 1");
+                }else{
+                    double tempDevice = deviceDirection + 360;
+                    diff = tempDevice - angleToNorth;
+                    System.out.println("FALL 2");
+                }
+            }else{
+                if(deviceDirection >= 0f){
+                    double tempNorth = angleToNorth + 360;
+                    diff = deviceDirection - tempNorth;
+                    System.out.println("FALL 3");
+                }else{
+                    double tempNorth = angleToNorth + 360;
+                    double tempDevice = deviceDirection + 360;
+                    diff = tempDevice - tempNorth;
+                    System.out.println("FALL 4");
+
+                }
+            }
+            System.out.println("DIFF = "+diff);
+
+            distYmapY = Math.cos(diff*D2RAD)*distanceY;
+            distYmapX = Math.sin(diff*D2RAD)*distanceY;
+            distXmapY = Math.cos(diff*D2RAD+90f*D2RAD)*distanceX;
+            distXmapX = Math.sin(diff*D2RAD+90f*D2RAD)*distanceX;
+
+            //System.out.println("distYmapY = "+distYmapY);
+            //System.out.println("distYmapX = "+distYmapX);
+            //System.out.println("distXmapY = "+distXmapY);
+            //System.out.println("distXmapX = "+distXmapX);
+
+            mapY = distYmapY + distXmapY;
+            mapX = distYmapX + distXmapX;
+
+            System.out.println("mapY = "+mapY);
+            System.out.println("mapX = "+mapX);
+
+
+        }
+
+        mHandler.post(updateUITask);
     }
 
     // **************************** GUI FUNCTIONS *********************************
-    
-    @Override
-	public void onCheckedChanged(RadioGroup group, int checkedId) {
-		switch(checkedId) {
-		case R.id.radio0:
-			radioSelection = 0;
-			break;
-		case R.id.radio1:
-			radioSelection = 1;
-			break;
-		case R.id.radio2:
-			radioSelection = 2;
-			break;
-		}
-	}
-    
+
     public void updateOreintationDisplay() {
-    	switch(radioSelection) {
-    	case 0:
-    		mAzimuthView.setText(d.format(accMagOrientation[0] * 180/Math.PI) + '°');
-            mPitchView.setText(d.format(accMagOrientation[1] * 180/Math.PI) + '°');
-            mRollView.setText(d.format(accMagOrientation[2] * 180/Math.PI) + '°');
-            mLinAccX.setText(d.format(worldLinearAccel[0]) + 'm'+'/'+'s'+'^'+'2');
-            mLinAccY.setText(d.format(worldLinearAccel[1]) + 'm'+'/'+'s'+'^'+'2');
-            mLinAccZ.setText(d.format(linearAccel[2]) + 'm'+'/'+'s'+'^'+'2');
-            mSpeedX.setText(d.format(speed[0]) + 'm'+'/'+'s');
-            mSpeedY.setText(d.format(speed[1]) + 'm'+'/'+'s');
-            mDistX.setText(d.format(distance[0]) + 'm');
-            mDistY.setText(d.format(distance[1]) + 'm');
-    		break;
-    	case 1:
-    		mAzimuthView.setText(d.format(gyroOrientation[0] * 180/Math.PI) + '°');
-            mPitchView.setText(d.format(gyroOrientation[1] * 180/Math.PI) + '°');
-            mRollView.setText(d.format(gyroOrientation[2] * 180/Math.PI) + '°');
-            mLinAccX.setText(d.format(worldLinearAccel[0]) + 'm'+'/'+'s'+'^'+'2');
-            mLinAccY.setText(d.format(worldLinearAccel[1]) + 'm'+'/'+'s'+'^'+'2');
-            mLinAccZ.setText(d.format(linearAccel[2]) + 'm'+'/'+'s'+'^'+'2');
-            mSpeedX.setText(d.format(speed[0]) + 'm'+'/'+'s');
-            mSpeedY.setText(d.format(speed[1]) + 'm'+'/'+'s');
-            mDistX.setText(d.format(distance[0]) + 'm');
-            mDistY.setText(d.format(distance[1]) + 'm');
-    		break;
-    	case 2:
-    		mAzimuthView.setText(d.format(fusedOrientation[0] * 180/Math.PI) + '°');
+    	// case 0 was accMagOrientation
+        // case 1 was gyroOrientation
+        if(running){
+            locationWarning.setVisibility(View.INVISIBLE);
+            mAzimuthView.setVisibility(View.VISIBLE);
+            mPitchView.setVisibility(View.VISIBLE);
+            mRollView.setVisibility(View.VISIBLE);
+            mLinAccX.setVisibility(View.VISIBLE);
+            mLinAccY.setVisibility(View.VISIBLE);
+            mLinAccZ.setVisibility(View.VISIBLE);
+            mSpeedX.setVisibility(View.VISIBLE);
+            mSpeedY.setVisibility(View.VISIBLE);
+            mDistX.setVisibility(View.VISIBLE);
+            mDistY.setVisibility(View.VISIBLE);
+            mAzimuthView.setText(d.format(fusedOrientation[0] * 180/Math.PI) + '°');
             mPitchView.setText(d.format(fusedOrientation[1] * 180/Math.PI) + '°');
             mRollView.setText(d.format(fusedOrientation[2] * 180/Math.PI) + '°');
             mLinAccX.setText(d.format(worldLinearAccel[0]) + 'm'+'/'+'s'+'^'+'2');
@@ -588,8 +693,34 @@ implements SensorEventListener, RadioGroup.OnCheckedChangeListener {
             mSpeedY.setText(d.format(speed[1]) + 'm'+'/'+'s');
             mDistX.setText(d.format(distance[0]) + 'm');
             mDistY.setText(d.format(distance[1]) + 'm');
-    		break;
-    	}
+            if(inBeaconRange){
+                mCurrentBeacon.setText(currentXMLBeacon.getMajor());
+                positionMap.setVisibility(View.VISIBLE);
+                mCurrentBeacon.setVisibility(View.VISIBLE);
+                position.setX(Float.parseFloat(currentXMLBeacon.getxPos())*pxTodp);
+                position.setY(Float.parseFloat(currentXMLBeacon.getyPos())*pxTodp);
+            }else{
+                mCurrentBeacon.setText(currentXMLBeacon.getMajor());
+                position.setX(150.0f*pxTodp);
+                position.setY(50.0f*pxTodp);
+            }
+        }else{
+            locationWarning.setVisibility(View.VISIBLE);
+            positionMap.setVisibility(View.INVISIBLE);
+            mCurrentBeacon.setVisibility(View.INVISIBLE);
+            mAzimuthView.setVisibility(View.INVISIBLE);
+            mPitchView.setVisibility(View.INVISIBLE);
+            mRollView.setVisibility(View.INVISIBLE);
+            mLinAccX.setVisibility(View.INVISIBLE);
+            mLinAccY.setVisibility(View.INVISIBLE);
+            mLinAccZ.setVisibility(View.INVISIBLE);
+            mSpeedX.setVisibility(View.INVISIBLE);
+            mSpeedY.setVisibility(View.INVISIBLE);
+            mDistX.setVisibility(View.INVISIBLE);
+            mDistY.setVisibility(View.INVISIBLE);
+        }
+
+
     }
     
     private Runnable updateOreintationDisplayTask = new Runnable() {
@@ -598,12 +729,110 @@ implements SensorEventListener, RadioGroup.OnCheckedChangeListener {
 		}
 	};
 
-    private void updateUI(){
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
+    private Runnable updateUITask = new Runnable(){
+        public void run() {
+            updateOreintationDisplay();
+        }
+    };
 
+    // **************************** BEACON FUNCTIONS *********************************
+    // BEACON METHODS
+
+    private static XMLBeacon isBeaconKnown(Beacon nearestBeacon, List<XMLLocation> locationList) {
+        String nBMajor = Integer.toString(nearestBeacon.getMajor());
+
+        for (XMLLocation loc : locationList) {
+            for (XMLBeacon b : loc.getBeaconList()) {
+                if (nBMajor.equalsIgnoreCase(b.getMajor())) {
+                    XMLBeacon recognizedB = new XMLBeacon();
+                    recognizedB = b;
+                    currentLocation = loc;
+                    return recognizedB;
+                }
+            }
+        }
+        return null;
+    }
+
+    private static boolean isBeaconInRange(Beacon nearestBeacon){
+        if(nearestBeacon.getRssi()>-60){
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.scan_menu, menu);
+        MenuItem refreshItem = menu.findItem(R.id.refresh);
+        refreshItem.setActionView(R.layout.actionbar_indeterminate_progress);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onDestroy() {
+        beaconManager.disconnect();
+
+        super.onDestroy();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        // Check if device supports Bluetooth Low Energy.
+        if (!beaconManager.hasBluetooth()) {
+            Toast.makeText(this, "Device does not have Bluetooth Low Energy", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        // If Bluetooth is not enabled, let user enable it.
+        if (!beaconManager.isBluetoothEnabled()) {
+            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+        } else {
+            connectToService();
+        }
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_ENABLE_BT) {
+            if (resultCode == Activity.RESULT_OK) {
+                connectToService();
+            } else {
+                Toast.makeText(this, "Bluetooth not enabled", Toast.LENGTH_LONG).show();
+                getActionBar().setSubtitle("Bluetooth not enabled");
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private void connectToService() {
+        getActionBar().setSubtitle("Scanning...");
+        beaconList = new ArrayList<Beacon>();
+        beaconManager.connect(new BeaconManager.ServiceReadyCallback() {
+            @Override
+            public void onServiceReady() {
+                try {
+                    beaconManager.startRanging(ALL_ESTIMOTE_BEACONS_REGION);
+                } catch (RemoteException e) {
+                    Toast.makeText(SensorFusionActivity.this, "Cannot start ranging, something terrible happened",
+                            Toast.LENGTH_LONG).show();
+                    Log.e(TAG, "Cannot start ranging", e);
+                }
             }
         });
     }
+
 }

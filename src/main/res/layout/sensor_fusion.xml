@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical" >
@@ -9,7 +9,28 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
 
+        <TableRow
+            android:id="@+id/tableRow0"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:layout_weight="1" >
 
+            <TextView
+                android:id="@+id/textViewCurrentBeacon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Nearest Beacon: " />
+
+            <TextView
+                android:id="@+id/textViewCurrentBeaconValue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10px"
+                android:text="0"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        </TableRow>
         <TableRow
             android:id="@+id/tableRow1"
             android:layout_width="match_parent"
@@ -210,7 +231,7 @@
                 android:id="@+id/textViewDistY"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Velocity in y: " />
+                android:text="Distance in y: " />
 
             <TextView
                 android:id="@+id/textViewDistYValue"
@@ -223,36 +244,39 @@
         </TableRow>
     </TableLayout>
 
-    <RadioGroup
-        android:id="@+id/radioGroup1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" >
-
-        <RadioButton
-            android:id="@+id/radio0"
+    <AbsoluteLayout
+        android:id="@+id/positionMap"
+        android:layout_width="300dp"
+        android:layout_height="400dp"
+        android:layout_centerInParent="true">
+        <ImageView
+            android:id="@+id/Map"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/pavillon_test"
+            android:scaleType="fitCenter"/>
+        <ImageView
+            android:id="@+id/position"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:checked="true"
-            android:text="Accelerometer/Magnetometer Orientation" />
+            android:src="@drawable/dot"
+            android:layout_x="280dp"
+            android:layout_y="145dp"/>
+    </AbsoluteLayout>
 
-        <RadioButton
-            android:id="@+id/radio1"
+    <AbsoluteLayout
+        android:id="@+id/locationWarning"
+        android:layout_width="300dp"
+        android:layout_height="400dp"
+        android:layout_centerInParent="true">
+
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Gyroscope Orientation (drift eliminated)" />
+            android:textAlignment="center"
+            android:text="No beacons detected! Please verify your position next to a beacon."
+            android:textColor="@android:color/holo_red_light"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+    </AbsoluteLayout>
 
-        <RadioButton
-            android:id="@+id/radio2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Orientation from Sensor Fusion" />
-    </RadioGroup>
-
-    <Button
-        android:id="@+id/saveStatsBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:text="Save Real World Acceleration"/>
-
-</LinearLayout>
+</RelativeLayout>

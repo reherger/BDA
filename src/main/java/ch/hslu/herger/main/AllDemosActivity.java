@@ -37,9 +37,8 @@ public class AllDemosActivity extends Activity {
     findViewById(R.id.ins_button).setOnClickListener(new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            Intent intent = new Intent(AllDemosActivity.this, BeaconScannerActivity.class);
+            Intent intent = new Intent(AllDemosActivity.this, SensorFusionActivity.class);
             startActivity(intent);
-
         }
     });
 
