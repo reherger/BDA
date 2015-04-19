@@ -25,7 +25,7 @@ public class LocationReader {
         "<id>1</id>"+
         "<name>HSLU</name>"+
         "<pathToMap>hslu.jpg</pathToMap>"+
-        "<angleToNorth>238</angleToNorth>"+
+        "<angleToNorth>138</angleToNorth>"+
         "<beaconList>"+
             // blue
             "<beacon>"+

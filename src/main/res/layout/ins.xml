@@ -1,32 +1,155 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
 
-    <TextView
-        android:id="@+id/tvNearestBeacon"
-        android:text="Nearest Beacon:"
+    <TableLayout
+        android:id="@+id/tableDebug"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-    <TextView
-        android:id="@+id/tvDistX"
-        android:text="Distance X: "
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="15dp"/>
-    <TextView
-        android:id="@+id/tvDistY"
-        android:text="Distance Y:"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="30dp"/>
-    <TextView
-        android:id="@+id/tvCompass"
-        android:text="Compass :"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="45dp"/>
+        android:layout_height="wrap_content" >
+
+        <TableRow
+            android:id="@+id/tableRow1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:layout_weight="1" >
+
+            <TextView
+                android:id="@+id/textView1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="(z-axis): " />
+
+            <TextView
+                android:id="@+id/textView4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10px"
+                android:text="0"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=" (x-axis): " />
+
+            <TextView
+                android:id="@+id/textView5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10px"
+                android:text="0"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+            <TextView
+                android:id="@+id/textView3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=" (y-axis): " />
+
+
+            <TextView
+                android:id="@+id/textView6"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10px"
+                android:text="0"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        </TableRow>
+
+
+        <TableRow
+            android:id="@+id/tableRow4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+
+            <TextView
+                android:id="@+id/textViewLAX"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Accel x: " />
+
+            <TextView
+                android:id="@+id/textViewLAXValue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10px"
+                android:text="0"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+            <TextView
+                android:id="@+id/textViewLAY"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=" Accel y: " />
+
+            <TextView
+                android:id="@+id/textViewLAYValue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10px"
+                android:text="0"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+            <TextView
+                android:id="@+id/textViewLAZ"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=" Accel in z: " />
+
+            <TextView
+                android:id="@+id/textViewLAZValue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10px"
+                android:text="0"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        </TableRow>
+        <TableRow
+            android:id="@+id/tableRow7"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+
+            <TextView
+                android:id="@+id/textViewSpeedX"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Speed x: " />
+
+            <TextView
+                android:id="@+id/textViewSpeedXValue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10px"
+                android:text="0"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+            <TextView
+                android:id="@+id/textViewSpeedY"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=" Speed y: " />
+
+            <TextView
+                android:id="@+id/textViewSpeedYValue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10px"
+                android:text="0"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/tableRow9"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+
+
+
+        </TableRow>
+
+    </TableLayout>
 
     <AbsoluteLayout
         android:id="@+id/positionMap"
@@ -39,13 +162,79 @@
             android:layout_height="match_parent"
             android:src="@drawable/pavillon_test"
             android:scaleType="fitCenter"/>
+
+        <ImageView
+            android:id="@+id/beaconPosition"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/beaconposition"
+            android:layout_x="280dp"
+            android:layout_y="105dp"/>
+
         <ImageView
             android:id="@+id/position"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/dot"
-            android:layout_x="280dp"
-            android:layout_y="145dp"/>
+            android:layout_x="140dp"
+            android:layout_y="200dp"/>
+
     </AbsoluteLayout>
+
+    <RelativeLayout
+        android:id="@+id/locationWarning"
+        android:visibility="invisible"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:background="@drawable/nobeaconinrange"
+        android:layout_centerInParent="true">
+
+    </RelativeLayout>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="bottom"
+        android:layout_marginTop="480dp">
+
+        <TableLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <TableRow
+                android:id="@+id/tableRow10"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" >
+
+                <TextView
+                    android:id="@+id/textViewDistX"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Distance x: " />
+
+                <TextView
+                    android:id="@+id/textViewDistXValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10px"
+                    android:text="0"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+                <TextView
+                    android:id="@+id/textViewDistY"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=" Distance y: " />
+
+                <TextView
+                    android:id="@+id/textViewDistYValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10px"
+                    android:text="0"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            </TableRow>
+        </TableLayout>
+    </RelativeLayout>
+
 
 </RelativeLayout>

@@ -47,7 +47,8 @@
 
         <activity
             android:name="ch.hslu.herger.main.InsActivity"
-            android:label="@string/title_activity_ins" >
+            android:label="@string/title_activity_ins"
+            android:screenOrientation="portrait">
         </activity>
         <activity
             android:name="ch.hslu.herger.sensor.LinearAccelerationActivity"

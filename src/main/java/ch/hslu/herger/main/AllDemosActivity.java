@@ -45,8 +45,7 @@ public class AllDemosActivity extends Activity {
       findViewById(R.id.sensorFusion_Button).setOnClickListener(new View.OnClickListener() {
           @Override
           public void onClick(View v) {
-              Intent intent = new Intent(AllDemosActivity.this, SensorFusionActivity.class);
-              intent.putExtra(BeaconScannerActivity.EXTRAS_TARGET_ACTIVITY, SensorFusionActivity.class.getName());
+              Intent intent = new Intent(AllDemosActivity.this, InsActivity.class);
               startActivity(intent);
           }
       });
