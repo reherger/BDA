@@ -43,6 +43,7 @@ import android.widget.AbsoluteLayout;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -134,6 +135,7 @@ implements SensorEventListener {
 	
 	// The following members are only for displaying the sensor output.
 	public Handler mHandler;
+    private TableLayout tableDebug;
 	private TextView mAzimuthView;
 	private TextView mPitchView;
 	private TextView mRollView;
@@ -148,6 +150,7 @@ implements SensorEventListener {
 
     private AbsoluteLayout positionMap;
     private ImageView position;
+    private ImageView beaconPosition;
 
     private RelativeLayout locationWarning;
 
@@ -213,6 +216,7 @@ implements SensorEventListener {
         d.setRoundingMode(RoundingMode.HALF_UP);
         d.setMaximumFractionDigits(3);
         d.setMinimumFractionDigits(3);
+        tableDebug = (TableLayout)findViewById(R.id.tableDebug);
         mAzimuthView = (TextView)findViewById(R.id.textView4);
         mPitchView = (TextView)findViewById(R.id.textView5);
         mRollView = (TextView)findViewById(R.id.textView6);
@@ -228,6 +232,7 @@ implements SensorEventListener {
         positionMap = (AbsoluteLayout) findViewById(R.id.positionMap);
         positionMap.setVisibility(View.INVISIBLE);
         position = (ImageView) findViewById(R.id.position);
+        beaconPosition = (ImageView) findViewById(R.id.beaconPosition);
 
         locationWarning = (RelativeLayout) findViewById(R.id.locationWarning);
 
@@ -680,17 +685,7 @@ implements SensorEventListener {
     	// case 0 was accMagOrientation
         // case 1 was gyroOrientation
         if(running){
-            locationWarning.setVisibility(View.INVISIBLE);
-            mAzimuthView.setVisibility(View.VISIBLE);
-            mPitchView.setVisibility(View.VISIBLE);
-            mRollView.setVisibility(View.VISIBLE);
-            mLinAccX.setVisibility(View.VISIBLE);
-            mLinAccY.setVisibility(View.VISIBLE);
-            mLinAccZ.setVisibility(View.VISIBLE);
-            mSpeedX.setVisibility(View.VISIBLE);
-            mSpeedY.setVisibility(View.VISIBLE);
-            mDistX.setVisibility(View.VISIBLE);
-            mDistY.setVisibility(View.VISIBLE);
+            tableDebug.setVisibility(View.INVISIBLE);
             mAzimuthView.setText(d.format(fusedOrientation[0] * 180/Math.PI) + '°');
             mPitchView.setText(d.format(fusedOrientation[1] * 180/Math.PI) + '°');
             mRollView.setText(d.format(fusedOrientation[2] * 180/Math.PI) + '°');
@@ -702,36 +697,33 @@ implements SensorEventListener {
             mDistX.setText(d.format(distance[0]) + 'm');
             mDistY.setText(d.format(distance[1]) + 'm');
             if(inBeaconRange){
+                locationWarning.setVisibility(View.INVISIBLE);
                 mCurrentBeacon.setText(currentXMLBeacon.getMajor());
                 positionMap.setVisibility(View.VISIBLE);
                 mCurrentBeacon.setVisibility(View.VISIBLE);
                 positionX = Float.parseFloat(currentXMLBeacon.getxPos());
                 positionY = Float.parseFloat(currentXMLBeacon.getyPos());
                 position.setX((float)positionX*pxTodp);
-                position.setY((float)positionY*pxTodp);
+                position.setY((float) positionY * pxTodp);
+                beaconPosition.setVisibility(View.VISIBLE);
+                beaconPosition.setX((float) positionX * pxTodp);
+                beaconPosition.setY((float) positionY * pxTodp);
                 System.out.println("Position X = "+positionX);
             }else{
+                locationWarning.setVisibility(View.INVISIBLE);
+                beaconPosition.setVisibility(View.INVISIBLE);
                 mCurrentBeacon.setText(currentXMLBeacon.getMajor()+"not in range");
-                positionX += mapX*10;
-                positionY += mapY*10;
+                positionX += mapX*5;
+                positionY += mapY*5;
                 System.out.println("Position X = "+positionX);
                 position.setX((float)positionX*pxTodp);
                 position.setY((float)positionY*pxTodp);
             }
         }else{
+            beaconPosition.setVisibility(View.INVISIBLE);
             locationWarning.setVisibility(View.VISIBLE);
             positionMap.setVisibility(View.INVISIBLE);
-            mCurrentBeacon.setVisibility(View.INVISIBLE);
-            mAzimuthView.setVisibility(View.INVISIBLE);
-            mPitchView.setVisibility(View.INVISIBLE);
-            mRollView.setVisibility(View.INVISIBLE);
-            mLinAccX.setVisibility(View.INVISIBLE);
-            mLinAccY.setVisibility(View.INVISIBLE);
-            mLinAccZ.setVisibility(View.INVISIBLE);
-            mSpeedX.setVisibility(View.INVISIBLE);
-            mSpeedY.setVisibility(View.INVISIBLE);
-            mDistX.setVisibility(View.INVISIBLE);
-            mDistY.setVisibility(View.INVISIBLE);
+            tableDebug.setVisibility(View.INVISIBLE);
         }
 
 
@@ -833,7 +825,7 @@ implements SensorEventListener {
     }
 
     private void connectToService() {
-        getActionBar().setSubtitle("Scanning...");
+        getActionBar().setSubtitle("Scanning for beacons...");
         beaconList = new ArrayList<Beacon>();
         beaconManager.connect(new BeaconManager.ServiceReadyCallback() {
             @Override

@@ -5,7 +5,7 @@
     android:orientation="vertical" >
 
     <TableLayout
-        android:id="@+id/tableLayout1"
+        android:id="@+id/tableDebug"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
 
@@ -255,17 +255,28 @@
             android:layout_height="match_parent"
             android:src="@drawable/pavillon_test"
             android:scaleType="fitCenter"/>
+
+        <ImageView
+            android:id="@+id/beaconPosition"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/beaconposition"
+            android:layout_x="280dp"
+            android:layout_y="105dp"/>
+
         <ImageView
             android:id="@+id/position"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/dot"
             android:layout_x="280dp"
-            android:layout_y="145dp"/>
+            android:layout_y="105dp"/>
+
     </AbsoluteLayout>
 
     <RelativeLayout
         android:id="@+id/locationWarning"
+        android:visibility="invisible"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:background="@drawable/nobeaconinrange"
