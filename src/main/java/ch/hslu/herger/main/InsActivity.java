@@ -101,11 +101,13 @@ public class InsActivity extends Activity
     private int noMovementXCount = 0;
     private int noMovementYCount = 0;
 
+    private double diff;
+
     private double mapX;
     private double mapY;
     // testpurpose
-    private double positionX = 140d;
-    private double positionY = 200d;
+    private double positionX = 400d;
+    private double positionY = 600d;
 
 
 
@@ -114,6 +116,7 @@ public class InsActivity extends Activity
 
     // final orientation angles from sensor fusion
     private float[] fusedOrientation = new float[3];
+
 
     // accelerometer and magnetometer based rotation matrix
     private float[] rotationMatrix = new float[9];
@@ -149,6 +152,7 @@ public class InsActivity extends Activity
     private TextView mDistX;
     private TextView mDistY;
     private TextView mCurrentBeacon;
+    private TextView difference;
 
     private AbsoluteLayout positionMap;
     private ImageView position;
@@ -230,6 +234,7 @@ public class InsActivity extends Activity
         mDistX = (TextView)findViewById(R.id.textViewDistXValue);
         mDistY = (TextView)findViewById(R.id.textViewDistYValue);
         mCurrentBeacon = (TextView)findViewById(R.id.textViewCurrentBeaconValue);
+        difference = (TextView)findViewById(R.id.textViewDiff);
 
         positionMap = (AbsoluteLayout) findViewById(R.id.positionMap);
         positionMap.setVisibility(View.INVISIBLE);
@@ -589,8 +594,6 @@ public class InsActivity extends Activity
             tempDistance[0] = speed[0]*dTAccel;
             tempDistance[1] = speed[1]*dTAccel;
 
-            System.out.println("tempDistanceX = "+tempDistance[0]);
-            System.out.println("tempDistanceY = "+tempDistance[1]);
             // ignore small acceleration
             if(worldLinearAccel[0]>0.2){
                 speed[0] += tempSpeed[0];
@@ -626,13 +629,13 @@ public class InsActivity extends Activity
         }
 
         // TODO calculate XY DIRECTION ON MAP
-        if(currentLocation != null) {
-            float angleToNorth = Float.valueOf(currentLocation.getAngleToNorth());
+        if(true == true) {
+            float angleToNorth = 138f;
             double deviceDirection = fusedOrientation[0]* 180/Math.PI;
             float distanceX = distance[0];
             float distanceY = distance[1];
 
-            double diff = 0;
+            diff = 0;
 
             double distYmapX = 0;
             double distYmapY = 0;
@@ -679,7 +682,7 @@ public class InsActivity extends Activity
             //System.out.println("mapY = "+mapY);
             //System.out.println("mapX = "+mapX);
 
-
+            System.out.println("DIFF = "+diff);
         }
 
         mHandler.post(updateUITask);
@@ -703,6 +706,7 @@ public class InsActivity extends Activity
             mSpeedY.setText(d.format(speed[1]) + 'm'+'/'+'s');
             mDistX.setText(d.format(distance[0]) + 'm');
             mDistY.setText(d.format(distance[1]) + 'm');
+            difference.setText(d.format(diff));
             if(true == false){
                 locationWarning.setVisibility(View.INVISIBLE);
                 mCurrentBeacon.setText(currentXMLBeacon.getMajor());
@@ -722,7 +726,6 @@ public class InsActivity extends Activity
                 beaconPosition.setVisibility(View.INVISIBLE);
                 positionX += mapX*M2DP;
                 positionY += mapY*M2DP;
-                System.out.println("Position X = "+positionX);
                 position.setX((float)positionX);
                 position.setY((float)positionY);
             }
