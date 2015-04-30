@@ -98,8 +98,11 @@ implements SensorEventListener {
     private float[] speed = new float[2];
     private float[] tempDistance = new float[2];
     private float[] distance = new float[2];
-    private int noMovementXCount = 0;
-    private int noMovementYCount = 0;
+
+    private float MINSPEED = 0.5f;
+    private float MAXSPEED = 2.5f;
+
+    private int noMovementCount = 0;
 
     private double mapX;
     private double mapY;
@@ -119,8 +122,9 @@ implements SensorEventListener {
     
     public static final float EPSILON = 0.000000001f;
     private static final float NS2S = 1.0f / 1000000000.0f;
-    private static final float MS2S = 1.0f / 1000000.0f;
     private static final double D2RAD = (2*Math.PI/360);
+    private static final double M2DP = 1*10;
+    private float PX2DP;
 	private float timestamp;
     private float timestampAccel;
 
@@ -175,9 +179,7 @@ implements SensorEventListener {
     private static final int REQUEST_ENABLE_BT = 1234;
     private static final Region ALL_ESTIMOTE_BEACONS_REGION = new Region("rid", null, null, null);
 
-    // Constant for converting Px to Dp
     private DisplayMetrics metrics;
-    private float pxTodp;
 
     private BeaconManager beaconManager;
     private List<Beacon> beaconList;
@@ -240,7 +242,7 @@ implements SensorEventListener {
 
         // Set Display Metrics
         metrics = getApplicationContext().getResources().getDisplayMetrics();
-        pxTodp = metrics.density;
+        PX2DP = metrics.density;
 
         // Initialize DataHandler
         dataHandler = DataHandler.getInstance();
@@ -580,36 +582,54 @@ implements SensorEventListener {
 
         if(timestampAccel != 0) {
             final float dTAccel = (time - timestampAccel) * NS2S;
-
             tempSpeed[0] = worldLinearAccel[0]*dTAccel;
             tempSpeed[1] = worldLinearAccel[1]*dTAccel;
 
-            tempDistance[0] = speed[0]*dTAccel;
-            tempDistance[1] = speed[1]*dTAccel;
-
             // ignore small acceleration
-            if(worldLinearAccel[0]>0.15){
-                speed[0] += tempSpeed[0];
-                distance[0] = tempDistance[0];
-                noMovementXCount = 0;
+            if(worldLinearAccel[0]>0.2f){
+                if(speed[0] < MINSPEED){
+                    speed[0] = MINSPEED;
+                    speed[0] += tempSpeed[0];
+                    distance[0] = speed[0]*dTAccel;
+                }
+                else if(speed[0] > MAXSPEED){
+                    speed[0] = MAXSPEED;
+                    distance[0] = speed[0]*dTAccel;
+                }else {
+                    speed[0] += tempSpeed[0];
+                    distance[0] = speed[0]*dTAccel;
+                }
+                noMovementCount = 0;
             }else {
-                noMovementXCount++;
+                noMovementCount++;
                 // too long no movement -> reset speed
-                if(noMovementXCount > 40) {
+                if(noMovementCount > 10) {
                     speed[0] = 0;
-                    noMovementXCount = 0;
+                    distance[0] = 0;
+                    noMovementCount = 0;
                 }
             }
-            if(worldLinearAccel[1]>0.15){
-                speed[1] += tempSpeed[1];
-                distance[1] = tempDistance[1];
-                noMovementYCount = 0;
+            if(worldLinearAccel[1]>0.2f){
+                if(speed[1] < MINSPEED){
+                    speed[1] = MINSPEED;
+                    speed[1] += tempSpeed[1];
+                    distance[1] = speed[1]*dTAccel;
+                }
+                else if(speed[1] > MAXSPEED){
+                    speed[1] = MAXSPEED;
+                    distance[1] = speed[1]*dTAccel;
+                }else {
+                    speed[1] += tempSpeed[1];
+                    distance[1] = speed[1]*dTAccel;
+                }
+                noMovementCount = 0;
             }else {
-                noMovementYCount++;
+                noMovementCount++;
                 // too long no movement -> reset speed
-                if(noMovementYCount > 40){
+                if(noMovementCount > 10){
                     speed[1] = 0;
-                    noMovementYCount = 0;
+                    distance[1] = 0;
+                    noMovementCount = 0;
                 }
             }
             // set current timestamp to old timestamp
@@ -623,56 +643,21 @@ implements SensorEventListener {
         if(currentLocation != null) {
             float angleToNorth = Float.valueOf(currentLocation.getAngleToNorth());
             double deviceDirection = fusedOrientation[0]* 180/Math.PI;
-            float distanceX = distance[0];
-            float distanceY = distance[1];
+            double[] rotatedVektor = new double[2];
+            // decrease influence of x direction
+            double distanceX = distance[0]*0.01d;
+            double distanceY = distance[1];
 
-            double diff = 0;
+            double diff = angleToNorth - deviceDirection;
 
-            double distYmapX = 0;
-            double distYmapY = 0;
-            double distXmapX = 0;
-            double distXmapY = 0;
+            // calcutlation rotatedVector with rotationMatrix
+            rotatedVektor[0] = distanceX*Math.cos(diff*D2RAD) - distanceY*Math.sin(diff*D2RAD);
+            rotatedVektor[1] = distanceX*Math.sin(diff*D2RAD) + distanceY*Math.cos(diff*D2RAD);
 
-            if(angleToNorth >= 0f){
-                if(deviceDirection >= 0f){
-                    diff = deviceDirection - angleToNorth;
-                    //System.out.println("FALL 1");
-                }else{
-                    double tempDevice = deviceDirection + 360;
-                    diff = tempDevice - angleToNorth;
-                    //System.out.println("FALL 2");
-                }
-            }else{
-                if(deviceDirection >= 0f){
-                    double tempNorth = angleToNorth + 360;
-                    diff = deviceDirection - tempNorth;
-                    //System.out.println("FALL 3");
-                }else{
-                    double tempNorth = angleToNorth + 360;
-                    double tempDevice = deviceDirection + 360;
-                    diff = tempDevice - tempNorth;
-                    //System.out.println("FALL 4");
-
-                }
-            }
-            //System.out.println("DIFF = "+diff);
-
-            distYmapY = Math.cos(diff*D2RAD)*distanceY;
-            distYmapX = Math.sin(diff*D2RAD)*distanceY;
-            distXmapY = Math.cos(diff*D2RAD+90f*D2RAD)*distanceX;
-            distXmapX = Math.sin(diff*D2RAD+90f*D2RAD)*distanceX;
-
-            //System.out.println("distYmapY = "+distYmapY);
-            //System.out.println("distYmapX = "+distYmapX);
-            //System.out.println("distXmapY = "+distXmapY);
-            //System.out.println("distXmapX = "+distXmapX);
-
-            mapY = distYmapY + distXmapY;
-            mapX = distYmapX + distXmapX;
-
-            //System.out.println("mapY = "+mapY);
-            //System.out.println("mapX = "+mapX);
-
+            // set vectors for displaying on map
+            // Y-Vector * -1 to get correct direction
+            mapX = rotatedVektor[0];
+            mapY = rotatedVektor[1] * -1;
 
         }
 
@@ -685,7 +670,7 @@ implements SensorEventListener {
     	// case 0 was accMagOrientation
         // case 1 was gyroOrientation
         if(running){
-            tableDebug.setVisibility(View.INVISIBLE);
+            //tableDebug.setVisibility(View.INVISIBLE);
             mAzimuthView.setText(d.format(fusedOrientation[0] * 180/Math.PI) + '°');
             mPitchView.setText(d.format(fusedOrientation[1] * 180/Math.PI) + '°');
             mRollView.setText(d.format(fusedOrientation[2] * 180/Math.PI) + '°');
@@ -703,27 +688,27 @@ implements SensorEventListener {
                 mCurrentBeacon.setVisibility(View.VISIBLE);
                 positionX = Float.parseFloat(currentXMLBeacon.getxPos());
                 positionY = Float.parseFloat(currentXMLBeacon.getyPos());
-                position.setX((float)positionX*pxTodp);
-                position.setY((float) positionY * pxTodp);
+                position.setX((float)positionX * PX2DP);
+                position.setY((float) positionY * PX2DP);
                 beaconPosition.setVisibility(View.VISIBLE);
-                beaconPosition.setX((float) positionX * pxTodp);
-                beaconPosition.setY((float) positionY * pxTodp);
-                System.out.println("Position X = "+positionX);
+                beaconPosition.setX((float) positionX * PX2DP);
+                beaconPosition.setY((float) positionY * PX2DP);
+                System.out.println("Position Y = "+positionY);
             }else{
                 locationWarning.setVisibility(View.INVISIBLE);
                 beaconPosition.setVisibility(View.INVISIBLE);
                 mCurrentBeacon.setText(currentXMLBeacon.getMajor()+"not in range");
-                positionX += mapX*5;
-                positionY += mapY*5;
-                System.out.println("Position X = "+positionX);
-                position.setX((float)positionX*pxTodp);
-                position.setY((float)positionY*pxTodp);
+                positionX += mapX*M2DP;
+                positionY += mapY*M2DP;
+                System.out.println("Position Y = "+positionY);
+                position.setX((float)positionX*PX2DP);
+                position.setY((float)positionY*PX2DP);
             }
         }else{
             beaconPosition.setVisibility(View.INVISIBLE);
             locationWarning.setVisibility(View.VISIBLE);
             positionMap.setVisibility(View.INVISIBLE);
-            tableDebug.setVisibility(View.INVISIBLE);
+            //tableDebug.setVisibility(View.INVISIBLE);
         }
 
 
