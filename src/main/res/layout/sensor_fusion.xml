@@ -253,7 +253,7 @@
             android:id="@+id/Map"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:src="@drawable/pavillon_test"
+            android:src="@drawable/pavillon"
             android:scaleType="fitCenter"/>
 
         <ImageView
@@ -269,8 +269,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/dot"
-            android:layout_x="280dp"
-            android:layout_y="105dp"/>
+            android:layout_x="7dp"
+            android:layout_y="150dp"/>
 
     </AbsoluteLayout>
 

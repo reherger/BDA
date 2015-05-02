@@ -98,8 +98,8 @@ public class InsActivity extends Activity
     private float[] speed = new float[2];
     private float[] distance = new float[2];
 
-    private float MINSPEED = 0.8f;
-    private float MAXSPEED = 2.5f;
+    private float MINSPEED = 1.0f;
+    private float MAXSPEED = 2.2f;
 
     private int noMovementCount = 0;
 
@@ -592,7 +592,7 @@ public class InsActivity extends Activity
             tempSpeed[1] = worldLinearAccel[1]*dTAccel;
 
             // ignore small acceleration
-            if(worldLinearAccel[0]>0.2f){
+            if(worldLinearAccel[0]>0.18f){
                 if(speed[0] < MINSPEED){
                     speed[0] = MINSPEED;
                     speed[0] += tempSpeed[0];
@@ -608,14 +608,8 @@ public class InsActivity extends Activity
                 noMovementCount = 0;
             }else {
                 noMovementCount++;
-                // too long no movement -> reset speed
-                if(noMovementCount > 10) {
-                    speed[0] = 0;
-                    distance[0] = 0;
-                    noMovementCount = 0;
-                }
             }
-            if(worldLinearAccel[1]>0.2f){
+            if(worldLinearAccel[1]>0.18f){
                 if(speed[1] < MINSPEED){
                     speed[1] = MINSPEED;
                     speed[1] += tempSpeed[1];
@@ -633,8 +627,11 @@ public class InsActivity extends Activity
                 noMovementCount++;
                 // too long no movement -> reset speed
                 if(noMovementCount > 10){
+                    // reset speed & distance
                     speed[1] = 0;
+                    speed[0] = 0;
                     distance[1] = 0;
+                    distance[0] = 0;
                     noMovementCount = 0;
                 }
             }

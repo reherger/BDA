@@ -99,8 +99,8 @@ implements SensorEventListener {
     private float[] tempDistance = new float[2];
     private float[] distance = new float[2];
 
-    private float MINSPEED = 0.5f;
-    private float MAXSPEED = 1.6f;
+    private float MINSPEED = 1.0f;
+    private float MAXSPEED = 2.2f;
 
     private int noMovementCount = 0;
 
@@ -164,13 +164,6 @@ implements SensorEventListener {
 
 	DecimalFormat d = new DecimalFormat("#.##");
 
-    // Acceleration Strings for Logging
-    private static StringBuilder sbX = new StringBuilder(10000000);
-    private static StringBuilder sbY = new StringBuilder(10000000);
-
-    // dataHandler
-    private DataHandler dataHandler;
-
     private static final String TAG = SensorFusionActivity.class.getSimpleName();
 
     public static final String EXTRAS_TARGET_ACTIVITY = "extrasTargetActivity";
@@ -224,7 +217,7 @@ implements SensorEventListener {
         mRollView = (TextView)findViewById(R.id.textView6);
         mLinAccX = (TextView)findViewById(R.id.textViewLAXValue);
         mLinAccY = (TextView)findViewById(R.id.textViewLAYValue);
-        mLinAccZ = (TextView)findViewById((R.id.textViewLAZValue));
+        mLinAccZ = (TextView)findViewById(R.id.textViewLAZValue);
         mSpeedX = (TextView)findViewById(R.id.textViewSpeedXValue);
         mSpeedY = (TextView)findViewById(R.id.textViewSpeedYValue);
         mDistX = (TextView)findViewById(R.id.textViewDistXValue);
@@ -243,9 +236,6 @@ implements SensorEventListener {
         // Set Display Metrics
         metrics = getApplicationContext().getResources().getDisplayMetrics();
         PX2DP = metrics.density;
-
-        // Initialize DataHandler
-        dataHandler = DataHandler.getInstance();
 
         // Configure verbose debug logging.
         L.enableDebugLogging(true);
@@ -310,7 +300,6 @@ implements SensorEventListener {
     public void onResume() {
     	super.onResume();
     	// restore the sensor listeners when user resumes the application.
-    	// TODO init listeners after Beacon detected
         initListeners();
     }
     
@@ -564,29 +553,32 @@ implements SensorEventListener {
         }
     }
 
-    public void calcAccelInWorldCoordinates(long time){
+    // Transforms AccelerationVectors from Device coordinate system to world coordinate system
+    public void calcAccelInWorldCoordinates(long time) {
 
-        worldLinearAccel[0] =(float) (linearAccel[0]*(Math.cos(fusedOrientation[2])*Math.cos(fusedOrientation[0])
-                +Math.sin(fusedOrientation[2])*Math.sin(fusedOrientation[1])*Math.sin(fusedOrientation[0]))
-                + linearAccel[1]*(Math.cos(fusedOrientation[1])*Math.sin(fusedOrientation[0]))
-                + linearAccel[2]*(-Math.sin(fusedOrientation[2])*Math.cos(fusedOrientation[0])
-                +Math.cos(fusedOrientation[2])*Math.sin(fusedOrientation[1])*Math.sin(fusedOrientation[0])));
-        worldLinearAccel[1] = (float) (linearAccel[0]*(-Math.cos(fusedOrientation[2])*Math.sin(fusedOrientation[0])
-                +Math.sin(fusedOrientation[2])*Math.sin(fusedOrientation[1])*Math.cos(fusedOrientation[0]))
-                + linearAccel[1]*(Math.cos(fusedOrientation[1])*Math.cos(fusedOrientation[0]))
-                + linearAccel[2]*(Math.sin(fusedOrientation[2])*Math.sin(fusedOrientation[0])
-                + Math.cos(fusedOrientation[2])*Math.sin(fusedOrientation[1])*Math.cos(fusedOrientation[0])));
+        worldLinearAccel[0] = (float) (linearAccel[0] * (Math.cos(fusedOrientation[2]) * Math.cos(fusedOrientation[0])
+                + Math.sin(fusedOrientation[2]) * Math.sin(fusedOrientation[1]) * Math.sin(fusedOrientation[0]))
+                + linearAccel[1] * (Math.cos(fusedOrientation[1]) * Math.sin(fusedOrientation[0]))
+                + linearAccel[2] * (-Math.sin(fusedOrientation[2]) * Math.cos(fusedOrientation[0])
+                + Math.cos(fusedOrientation[2]) * Math.sin(fusedOrientation[1]) * Math.sin(fusedOrientation[0])));
+        worldLinearAccel[1] = (float) (linearAccel[0] * (-Math.cos(fusedOrientation[2]) * Math.sin(fusedOrientation[0])
+                + Math.sin(fusedOrientation[2]) * Math.sin(fusedOrientation[1]) * Math.cos(fusedOrientation[0]))
+                + linearAccel[1] * (Math.cos(fusedOrientation[1]) * Math.cos(fusedOrientation[0]))
+                + linearAccel[2] * (Math.sin(fusedOrientation[2]) * Math.sin(fusedOrientation[0])
+                + Math.cos(fusedOrientation[2]) * Math.sin(fusedOrientation[1]) * Math.cos(fusedOrientation[0])));
 
-        //sbX.append(worldLinearAccel[0]+";");
-        //sbY.append(worldLinearAccel[1]+";");
+        // call Distance Calculation method
+        calcDistanceVectors(time);
+    }
 
+    public void calcDistanceVectors(long time) {
         if(timestampAccel != 0) {
             final float dTAccel = (time - timestampAccel) * NS2S;
             tempSpeed[0] = worldLinearAccel[0]*dTAccel;
             tempSpeed[1] = worldLinearAccel[1]*dTAccel;
 
             // ignore small acceleration
-            if(worldLinearAccel[0]>0.25f){
+            if(worldLinearAccel[0]>0.18f){
                 if(speed[0] < MINSPEED){
                     speed[0] = MINSPEED;
                     speed[0] += tempSpeed[0];
@@ -602,14 +594,8 @@ implements SensorEventListener {
                 noMovementCount = 0;
             }else {
                 noMovementCount++;
-                // too long no movement -> reset speed
-                if(noMovementCount > 1) {
-                    speed[0] = 0;
-                    distance[0] = 0;
-                    noMovementCount = 0;
-                }
             }
-            if(worldLinearAccel[1]>0.25f){
+            if(worldLinearAccel[1]>0.18f){
                 if(speed[1] < MINSPEED){
                     speed[1] = MINSPEED;
                     speed[1] += tempSpeed[1];
@@ -626,9 +612,12 @@ implements SensorEventListener {
             }else {
                 noMovementCount++;
                 // too long no movement -> reset speed
-                if(noMovementCount > 1){
+                if(noMovementCount > 10){
+                    // reset speed & distance
                     speed[1] = 0;
+                    speed[0] = 0;
                     distance[1] = 0;
+                    distance[0] = 0;
                     noMovementCount = 0;
                 }
             }
@@ -639,7 +628,12 @@ implements SensorEventListener {
             timestampAccel = time;
         }
 
-        // TODO calculate XY DIRECTION ON MAP
+        // Call Calculation for Distances on Map and calls UI Handler
+        calcDistanceOnMap();
+    }
+
+    // Calculates Distances on Map and updates UI
+    public void calcDistanceOnMap(){
         if(currentLocation != null) {
             float angleToNorth = Float.valueOf(currentLocation.getAngleToNorth());
             double deviceDirection = fusedOrientation[0]* 180/Math.PI;
@@ -683,7 +677,7 @@ implements SensorEventListener {
             mDistY.setText(d.format(distance[1]) + 'm');
             if(inBeaconRange){
                 locationWarning.setVisibility(View.INVISIBLE);
-                mCurrentBeacon.setText(currentXMLBeacon.getMajor());
+                mCurrentBeacon.setText(currentXMLBeacon.getMajor() + currentBeacon.getRssi());
                 positionMap.setVisibility(View.VISIBLE);
                 mCurrentBeacon.setVisibility(View.VISIBLE);
                 positionX = Float.parseFloat(currentXMLBeacon.getxPos());
@@ -713,12 +707,6 @@ implements SensorEventListener {
 
 
     }
-    
-    private Runnable updateOreintationDisplayTask = new Runnable() {
-		public void run() {
-			updateOreintationDisplay();
-		}
-	};
 
     private Runnable updateUITask = new Runnable(){
         public void run() {
@@ -746,7 +734,7 @@ implements SensorEventListener {
     }
 
     private static boolean isBeaconInRange(Beacon nearestBeacon){
-        if(nearestBeacon.getRssi()>-60){
+        if(nearestBeacon.getRssi()>-50){
             return true;
         }
         return false;

@@ -1,13 +1,10 @@
 package ch.hslu.herger.config;
 
 
-import android.util.Log;
-
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -26,6 +23,53 @@ public class LocationReader {
         "<name>HSLU</name>"+
         "<pathToMap>hslu.jpg</pathToMap>"+
         "<angleToNorth>138</angleToNorth>"+
+        "<roomList>"+
+            "<room>"+
+                "<roomId>0001</roomId>"+
+                "<xLeftUpperCornerRoom>140</xLeftUpperCornerRoom>"+
+                "<yLeftUpperCornerRoom>11</yLeftUpperCornerRoom>"+
+                "<width>140</width>"+
+                "<height>140</height>"+
+                "<doorList>"+
+                    "<door>"+
+                        "<xLeftUpperCornerDoor>145</xLeftUpperCornerDoor>"+
+                        "<yLeftUpperCornerDoor>110</yLeftUpperCornerDoor>"+
+                        "<areaWidth>5</areaWidth>"+
+                        "<areaHeight>30</areaHeight>"+
+                    "</door>"+
+                "</doorList>"+
+            "</room>"+
+            "<room>"+
+                "<roomId>0002</roomId>"+
+                "<xLeftUpperCornerRoom>74</xLeftUpperCornerRoom>"+
+                "<yLeftUpperCornerRoom>117</yLeftUpperCornerRoom>"+
+                "<width>61</width>"+
+                "<height>38</height>"+
+                "<doorList>"+
+                    "<door>"+
+                        "<xLeftUpperCornerDoor>74</xLeftUpperCornerDoor>"+
+                        "<yLeftUpperCornerDoor>150</yLeftUpperCornerDoor>"+
+                        "<areaWidth>61</areaWidth>"+
+                        "<areaHeight>5</areaHeight>"+
+                    "</door>"+
+                "</doorList>"+
+            "</room>"+
+            "<room>"+
+                "<roomId>0003</roomId>"+
+                "<xLeftUpperCornerRoom>33</xLeftUpperCornerRoom>"+
+                "<yLeftUpperCornerRoom>155</yLeftUpperCornerRoom>"+
+                "<width>148</width>"+
+                "<height>127</height>"+
+                "<doorList>"+
+                    "<door>"+
+                        "<xLeftUpperCornerDoor>74</xLeftUpperCornerDoor>"+
+                        "<yLeftUpperCornerDoor>155</yLeftUpperCornerDoor>"+
+                        "<areaWidth>61</areaWidth>"+
+                        "<areaHeight>5</areaHeight>"+
+                    "</door>"+
+                "</doorList>"+
+            "</room>"+
+        "</roomList>"+
         "<beaconList>"+
             // blue
             "<beacon>"+
@@ -58,6 +102,10 @@ public class LocationReader {
 
     private static List<XMLLocation> locList;
     private static XMLLocation location;
+    private static List<XMLRoom> roomList;
+    private static XMLRoom room;
+    private static List<XMLDoor> doorList;
+    private static XMLDoor door;
     private static List<XMLBeacon> beaconList;
     private static XMLBeacon beacon;
 
@@ -98,12 +146,7 @@ public class LocationReader {
 
     public void processStartElement (XmlPullParser xpp) throws XmlPullParserException, IOException {
         String name = xpp.getName();
-        //String uri = xpp.getNamespace();
-        //if ("".equals (uri)) {
-        //    System.out.println("Start element: " + name);
-        //} else {
-        //    System.out.println("Start element (with uri): {" + uri + "}" + name);
-        //}
+
         if(name.equalsIgnoreCase("locations")){
             locList = new ArrayList<XMLLocation>();
         }else if(name.equalsIgnoreCase("location")){
@@ -120,9 +163,44 @@ public class LocationReader {
         }else if(name.equalsIgnoreCase("angleToNorth")){
             xpp.next();
             location.setAngleToNorth(xpp.getText());
+        }else if(name.equalsIgnoreCase("roomList")){
+            roomList = new ArrayList<XMLRoom>();
+        }else if(name.equalsIgnoreCase("room")){
+            room = new XMLRoom();
+        }else if(name.equalsIgnoreCase("roomId")) {
+            xpp.next();
+            room.setRoomId(xpp.getText());
+        }else if(name.equalsIgnoreCase("xLeftUpperCornerRoom")){
+            xpp.next();
+            room.setXleftUpperCorner(xpp.getText());
+        }else if(name.equalsIgnoreCase("yLeftUpperCornerRoom")){
+            xpp.next();
+            room.setYleftUpperCorner(xpp.getText());
+        }else if(name.equalsIgnoreCase("width")){
+            xpp.next();
+            room.setWidth(xpp.getText());
+        }else if(name.equalsIgnoreCase("height")){
+            xpp.next();
+            room.setHeight(xpp.getText());
+        }else if(name.equalsIgnoreCase("doorList")){
+            doorList = new ArrayList<XMLDoor>();
+        }else if(name.equalsIgnoreCase("door")){
+            door = new XMLDoor();
+        }else if(name.equalsIgnoreCase("xLeftUpperCornerDoor")) {
+            xpp.next();
+            door.setxLeftUpperCorner(xpp.getText());
+        }else if(name.equalsIgnoreCase("yLeftUpperCornerDoor")){
+            xpp.next();
+            door.setyLeftUpperCorner(xpp.getText());
+        }else if(name.equalsIgnoreCase("areaWidth")){
+            xpp.next();
+            door.setAreaWidth(xpp.getText());
+        }else if(name.equalsIgnoreCase("areaHeight")){
+            xpp.next();
+            door.setAreaWidth(xpp.getText());
         }else if(name.equalsIgnoreCase("beaconList")){
             beaconList = new ArrayList<XMLBeacon>();
-        }else if(name.equalsIgnoreCase("beacon")){
+        }else if(name.equalsIgnoreCase("beacon")) {
             beacon = new XMLBeacon();
         }else if(name.equalsIgnoreCase("uuid")){
             xpp.next();
@@ -159,6 +237,14 @@ public class LocationReader {
             location.setBeaconList(beaconList);
         }else if(name.equalsIgnoreCase("location")){
             locList.add(location);
+        }else if(name.equalsIgnoreCase("door")){
+            doorList.add(door);
+        }else if(name.equalsIgnoreCase("doorList")){
+            room.setDoorList(doorList);
+        }else if(name.equalsIgnoreCase("room")){
+            roomList.add(room);
+        }else if(name.equalsIgnoreCase("roomList")){
+            location.setRoomList(roomList);
         }else{
             // do nothing...
         }

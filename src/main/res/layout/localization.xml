@@ -10,7 +10,7 @@
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:src="@drawable/pavillon_test"
+            android:src="@drawable/pavillon"
             android:scaleType="fitCenter"/>
         <ImageView
             android:layout_width="wrap_content"
