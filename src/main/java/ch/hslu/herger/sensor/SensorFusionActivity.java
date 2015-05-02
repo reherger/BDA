@@ -100,7 +100,7 @@ implements SensorEventListener {
     private float[] distance = new float[2];
 
     private float MINSPEED = 0.5f;
-    private float MAXSPEED = 2.5f;
+    private float MAXSPEED = 1.6f;
 
     private int noMovementCount = 0;
 
@@ -586,7 +586,7 @@ implements SensorEventListener {
             tempSpeed[1] = worldLinearAccel[1]*dTAccel;
 
             // ignore small acceleration
-            if(worldLinearAccel[0]>0.2f){
+            if(worldLinearAccel[0]>0.25f){
                 if(speed[0] < MINSPEED){
                     speed[0] = MINSPEED;
                     speed[0] += tempSpeed[0];
@@ -603,13 +603,13 @@ implements SensorEventListener {
             }else {
                 noMovementCount++;
                 // too long no movement -> reset speed
-                if(noMovementCount > 10) {
+                if(noMovementCount > 1) {
                     speed[0] = 0;
                     distance[0] = 0;
                     noMovementCount = 0;
                 }
             }
-            if(worldLinearAccel[1]>0.2f){
+            if(worldLinearAccel[1]>0.25f){
                 if(speed[1] < MINSPEED){
                     speed[1] = MINSPEED;
                     speed[1] += tempSpeed[1];
@@ -626,7 +626,7 @@ implements SensorEventListener {
             }else {
                 noMovementCount++;
                 // too long no movement -> reset speed
-                if(noMovementCount > 10){
+                if(noMovementCount > 1){
                     speed[1] = 0;
                     distance[1] = 0;
                     noMovementCount = 0;
