@@ -26,11 +26,13 @@ package ch.hslu.herger.main;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.RemoteException;
 import android.util.DisplayMetrics;
@@ -108,8 +110,8 @@ public class InsActivity extends Activity
     private double mapX;
     private double mapY;
     // testpurpose
-    private double positionX = 140d;
-    private double positionY = 200d;
+    private double positionX = 215d;
+    private double positionY = 15d;
 
 
 
@@ -156,6 +158,7 @@ public class InsActivity extends Activity
     private TextView difference;
 
     private AbsoluteLayout positionMap;
+    private ImageView map;
     private ImageView position;
     private ImageView beaconPosition;
 
@@ -238,6 +241,16 @@ public class InsActivity extends Activity
         difference = (TextView)findViewById(R.id.textViewDiff);
 
         positionMap = (AbsoluteLayout) findViewById(R.id.positionMap);
+        map = (ImageView)findViewById(R.id.map);
+
+        File file = new File(Environment.getExternalStorageDirectory() + "/iBeaconIndoorLokalisierung/pavillon.jpg");
+        if(file.exists()){
+            Drawable mDrawable = Drawable.createFromPath(file.getAbsolutePath());
+            map.setImageDrawable(mDrawable);
+        }
+
+
+
         positionMap.setVisibility(View.INVISIBLE);
         position = (ImageView) findViewById(R.id.position);
         beaconPosition = (ImageView) findViewById(R.id.beaconPosition);
@@ -644,7 +657,7 @@ public class InsActivity extends Activity
 
         // TODO calculate XY DIRECTION ON MAP
         if(true == true) {
-            float angleToNorth = 138f;
+            float angleToNorth = -10f;
             double deviceDirection = fusedOrientation[0]* 180/Math.PI;
             double[] rotatedVektor = new double[2];
             double distanceX = distance[0]*0.2d;

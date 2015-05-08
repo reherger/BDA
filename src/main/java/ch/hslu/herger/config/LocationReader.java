@@ -22,25 +22,25 @@ public class LocationReader {
         "<id>1</id>"+
         "<name>HSLU</name>"+
         "<pathToMap>hslu.jpg</pathToMap>"+
-        "<angleToNorth>138</angleToNorth>"+
+        "<angleToNorth>-10</angleToNorth>"+
         "<roomList>"+
             "<room>"+
-                "<roomId>0001</roomId>"+
+                "<roomId>001001</roomId>"+
                 "<xLeftUpperCornerRoom>140</xLeftUpperCornerRoom>"+
                 "<yLeftUpperCornerRoom>11</yLeftUpperCornerRoom>"+
                 "<width>140</width>"+
                 "<height>140</height>"+
                 "<doorList>"+
                     "<door>"+
-                        "<xLeftUpperCornerDoor>145</xLeftUpperCornerDoor>"+
+                        "<xLeftUpperCornerDoor>125</xLeftUpperCornerDoor>"+
                         "<yLeftUpperCornerDoor>110</yLeftUpperCornerDoor>"+
-                        "<areaWidth>5</areaWidth>"+
-                        "<areaHeight>30</areaHeight>"+
+                        "<areaWidth>50</areaWidth>"+
+                        "<areaHeight>25</areaHeight>"+
                     "</door>"+
                 "</doorList>"+
             "</room>"+
             "<room>"+
-                "<roomId>0002</roomId>"+
+                "<roomId>002001</roomId>"+
                 "<xLeftUpperCornerRoom>74</xLeftUpperCornerRoom>"+
                 "<yLeftUpperCornerRoom>117</yLeftUpperCornerRoom>"+
                 "<width>61</width>"+
@@ -48,24 +48,30 @@ public class LocationReader {
                 "<doorList>"+
                     "<door>"+
                         "<xLeftUpperCornerDoor>74</xLeftUpperCornerDoor>"+
-                        "<yLeftUpperCornerDoor>150</yLeftUpperCornerDoor>"+
+                        "<yLeftUpperCornerDoor>145</yLeftUpperCornerDoor>"+
                         "<areaWidth>61</areaWidth>"+
-                        "<areaHeight>5</areaHeight>"+
+                        "<areaHeight>25</areaHeight>"+
+                    "</door>"+
+                    "<door>"+
+                    "<xLeftUpperCornerDoor>125</xLeftUpperCornerDoor>"+
+                    "<yLeftUpperCornerDoor>110</yLeftUpperCornerDoor>"+
+                    "<areaWidth>50</areaWidth>"+
+                    "<areaHeight>25</areaHeight>"+
                     "</door>"+
                 "</doorList>"+
             "</room>"+
             "<room>"+
-                "<roomId>0003</roomId>"+
+                "<roomId>003001</roomId>"+
                 "<xLeftUpperCornerRoom>33</xLeftUpperCornerRoom>"+
                 "<yLeftUpperCornerRoom>155</yLeftUpperCornerRoom>"+
                 "<width>148</width>"+
                 "<height>127</height>"+
                 "<doorList>"+
                     "<door>"+
-                        "<xLeftUpperCornerDoor>74</xLeftUpperCornerDoor>"+
-                        "<yLeftUpperCornerDoor>155</yLeftUpperCornerDoor>"+
-                        "<areaWidth>61</areaWidth>"+
-                        "<areaHeight>5</areaHeight>"+
+                    "<xLeftUpperCornerDoor>74</xLeftUpperCornerDoor>"+
+                    "<yLeftUpperCornerDoor>145</yLeftUpperCornerDoor>"+
+                    "<areaWidth>61</areaWidth>"+
+                    "<areaHeight>25</areaHeight>"+
                     "</door>"+
                 "</doorList>"+
             "</room>"+
@@ -73,9 +79,9 @@ public class LocationReader {
         "<beaconList>"+
             // blue
             "<beacon>"+
-                "<uuid>01</uuid>"+
+                "<uuid>001</uuid>"+
                 "<major>110</major>"+
-                "<minor>1110</minor>"+
+                "<minor>001001</minor>"+
                 "<xPos>280</xPos>"+
                 "<yPos>12</yPos>"+
             "</beacon>"+
@@ -83,7 +89,7 @@ public class LocationReader {
             "<beacon>"+
                 "<uuid>02</uuid>"+
                 "<major>111</major>"+
-                "<minor>1120</minor>"+
+                "<minor>001001</minor>"+
                 "<xPos>145</xPos>"+
                 "<yPos>75</yPos>"+
             "</beacon>"+
@@ -92,7 +98,7 @@ public class LocationReader {
             "<beacon>"+
             "<uuid>02</uuid>"+
             "<major>112</major>"+
-            "<minor>1130</minor>"+
+            "<minor>001001</minor>"+
             "<xPos>280</xPos>"+
             "<yPos>145</yPos>"+
             "</beacon>"+
@@ -109,7 +115,7 @@ public class LocationReader {
     private static List<XMLBeacon> beaconList;
     private static XMLBeacon beacon;
 
-    public static List<XMLLocation> readXML() throws XmlPullParserException, IOException {
+    public static List<XMLLocation> readXML(String config) throws XmlPullParserException, IOException {
         XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
         factory.setNamespaceAware(true);
         XmlPullParser xpp = factory.newPullParser();
@@ -118,7 +124,7 @@ public class LocationReader {
         LocationReader app = new LocationReader();
 
         System.out.println("Parsing simple sample XML");//:\n"+ SAMPLE_XML);
-        xpp.setInput( new StringReader( SAMPLE_XML ) );
+        xpp.setInput( new StringReader( config ) );
         app.processDocument(xpp);
 
         return locList;
@@ -197,7 +203,7 @@ public class LocationReader {
             door.setAreaWidth(xpp.getText());
         }else if(name.equalsIgnoreCase("areaHeight")){
             xpp.next();
-            door.setAreaWidth(xpp.getText());
+            door.setAreaHeight(xpp.getText());
         }else if(name.equalsIgnoreCase("beaconList")){
             beaconList = new ArrayList<XMLBeacon>();
         }else if(name.equalsIgnoreCase("beacon")) {

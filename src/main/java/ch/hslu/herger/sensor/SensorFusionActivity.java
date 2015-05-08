@@ -26,11 +26,13 @@ package ch.hslu.herger.sensor;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.RemoteException;
 import android.util.DisplayMetrics;
@@ -65,7 +67,9 @@ import java.util.TimerTask;
 import ch.hslu.herger.beacon.BeaconComparator;
 import ch.hslu.herger.config.Configuration;
 import ch.hslu.herger.config.XMLBeacon;
+import ch.hslu.herger.config.XMLDoor;
 import ch.hslu.herger.config.XMLLocation;
+import ch.hslu.herger.config.XMLRoom;
 import ch.hslu.herger.data.DataHandler;
 import ch.hslu.herger.main.R;
 
@@ -107,7 +111,9 @@ implements SensorEventListener {
     private double mapX;
     private double mapY;
     private double positionX;
+    private double lastPositionX;
     private double positionY;
+    private double lastPositionY;
 
 
  
@@ -153,6 +159,7 @@ implements SensorEventListener {
     private TextView mCurrentBeacon;
 
     private AbsoluteLayout positionMap;
+    private ImageView map;
     private ImageView position;
     private ImageView beaconPosition;
 
@@ -180,6 +187,8 @@ implements SensorEventListener {
     private XMLBeacon currentXMLBeacon;
 
     private static XMLLocation currentLocation;
+    private static XMLRoom currentRoom;
+    private static List<XMLDoor> currentDoorList;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -225,6 +234,8 @@ implements SensorEventListener {
         mCurrentBeacon = (TextView)findViewById(R.id.textViewCurrentBeaconValue);
 
         positionMap = (AbsoluteLayout) findViewById(R.id.positionMap);
+        map = (ImageView)findViewById(R.id.map);
+
         positionMap.setVisibility(View.INVISIBLE);
         position = (ImageView) findViewById(R.id.position);
         beaconPosition = (ImageView) findViewById(R.id.beaconPosition);
@@ -635,11 +646,12 @@ implements SensorEventListener {
     // Calculates Distances on Map and updates UI
     public void calcDistanceOnMap(){
         if(currentLocation != null) {
+
             float angleToNorth = Float.valueOf(currentLocation.getAngleToNorth());
             double deviceDirection = fusedOrientation[0]* 180/Math.PI;
             double[] rotatedVektor = new double[2];
             // decrease influence of x direction
-            double distanceX = distance[0]*0.01d;
+            double distanceX = distance[0]*0.2d;
             double distanceY = distance[1];
 
             double diff = angleToNorth - deviceDirection;
@@ -647,6 +659,7 @@ implements SensorEventListener {
             // calcutlation rotatedVector with rotationMatrix
             rotatedVektor[0] = distanceX*Math.cos(diff*D2RAD) - distanceY*Math.sin(diff*D2RAD);
             rotatedVektor[1] = distanceX*Math.sin(diff*D2RAD) + distanceY*Math.cos(diff*D2RAD);
+
 
             // set vectors for displaying on map
             // Y-Vector * -1 to get correct direction
@@ -656,6 +669,50 @@ implements SensorEventListener {
         }
 
         mHandler.post(updateUITask);
+    }
+
+    public void prohibitWallCrossing(){
+        if(currentRoom != null && currentDoorList != null){
+            // get postion of walls
+            double minX = Double.valueOf(currentRoom.getXleftUpperCorner());
+            double maxX = minX + Double.valueOf(currentRoom.getWidth());
+            double minY = Double.valueOf(currentRoom.getYleftUpperCorner());
+            double maxY = minY + Double.valueOf(currentRoom.getHeight());
+
+
+            if(positionX >= minX && positionX <= maxX) {
+                // everything OK
+            }else{
+                for(XMLDoor door : currentDoorList){
+                    double dMinX = Double.valueOf(door.getxLeftUpperCorner());
+                    double dMaxX = dMinX + Double.valueOf(door.getAreaWidth());
+                    double dMinY = Double.valueOf(door.getyLeftUpperCorner());
+                    double dMaxY = dMinY + Double.valueOf(door.getAreaHeight());
+                    if(positionX >= dMinX && positionX <= dMaxX && positionY >= dMinY && positionY <= dMaxY){
+                        // everything OK
+                    }else{
+                        // reset position to last known
+                        positionX = lastPositionX;
+                    }
+                }
+            }
+            if(positionY >= minY && positionY <= maxY){
+                // everything OK
+            }else{
+                // TODO check if value is in Door area
+                for(XMLDoor door : currentDoorList){
+                    double dMinX = Double.valueOf(door.getxLeftUpperCorner());
+                    double dMaxX = dMinX + Double.valueOf(door.getAreaWidth());
+                    double dMinY = Double.valueOf(door.getyLeftUpperCorner());
+                    double dMaxY = dMinY + Double.valueOf(door.getAreaHeight());
+                    if(positionY >= dMinY && positionY <= dMaxY && positionX >= dMinX && positionX <= dMaxX){
+                        // everything OK
+                    }else{
+                        positionY = lastPositionY;
+                    }
+                }
+            }
+        }
     }
 
     // **************************** GUI FUNCTIONS *********************************
@@ -682,19 +739,20 @@ implements SensorEventListener {
                 mCurrentBeacon.setVisibility(View.VISIBLE);
                 positionX = Float.parseFloat(currentXMLBeacon.getxPos());
                 positionY = Float.parseFloat(currentXMLBeacon.getyPos());
-                position.setX((float)positionX * PX2DP);
+                position.setX((float) positionX * PX2DP);
                 position.setY((float) positionY * PX2DP);
                 beaconPosition.setVisibility(View.VISIBLE);
                 beaconPosition.setX((float) positionX * PX2DP);
                 beaconPosition.setY((float) positionY * PX2DP);
-                System.out.println("Position Y = "+positionY);
             }else{
                 locationWarning.setVisibility(View.INVISIBLE);
                 beaconPosition.setVisibility(View.INVISIBLE);
-                mCurrentBeacon.setText(currentXMLBeacon.getMajor()+"not in range");
+                mCurrentBeacon.setText(currentXMLBeacon.getMajor() + "not in range");
+                lastPositionX = positionX;
+                lastPositionY = positionY;
                 positionX += mapX*M2DP;
                 positionY += mapY*M2DP;
-                System.out.println("Position Y = "+positionY);
+                prohibitWallCrossing();
                 position.setX((float)positionX*PX2DP);
                 position.setY((float)positionY*PX2DP);
             }
@@ -704,8 +762,6 @@ implements SensorEventListener {
             positionMap.setVisibility(View.INVISIBLE);
             //tableDebug.setVisibility(View.INVISIBLE);
         }
-
-
     }
 
     private Runnable updateUITask = new Runnable(){
@@ -714,10 +770,21 @@ implements SensorEventListener {
         }
     };
 
+    private void loadCorrectBackgroundMap(String path){
+        File file = new File(Environment.getExternalStorageDirectory() + "/iBeaconIndoorLokalisierung/"+path);
+        if(file.exists()){
+            Drawable mDrawable = Drawable.createFromPath(file.getAbsolutePath());
+            map.setImageDrawable(mDrawable);
+        }
+    }
+
     // **************************** BEACON FUNCTIONS *********************************
     // BEACON METHODS
 
-    private static XMLBeacon isBeaconKnown(Beacon nearestBeacon, List<XMLLocation> locationList) {
+    // Checks if Beacon is known by searching in all configured locations
+    // sets current location, currentRoom, currentDoorList
+    // returns nearest Beacon
+    private XMLBeacon isBeaconKnown(Beacon nearestBeacon, List<XMLLocation> locationList) {
         String nBMajor = Integer.toString(nearestBeacon.getMajor());
 
         for (XMLLocation loc : locationList) {
@@ -726,6 +793,18 @@ implements SensorEventListener {
                     XMLBeacon recognizedB = new XMLBeacon();
                     recognizedB = b;
                     currentLocation = loc;
+                    loadCorrectBackgroundMap(loc.getPathToMap());
+                    System.out.println("Current Location = " + currentLocation.getName());
+                    // set current Room
+                    for (XMLRoom r : loc.getRoomList()){
+                        if(b.getMinor().equalsIgnoreCase(r.getRoomId())){
+                            currentRoom = r;
+                            System.out.println("Current room = " + currentRoom.getRoomId());
+                            currentDoorList = r.getDoorList();
+                            System.out.println("Current doorList = " + currentDoorList.toString());
+                        }
+                    }
+
                     return recognizedB;
                 }
             }

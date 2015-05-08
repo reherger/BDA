@@ -250,10 +250,9 @@
         android:layout_height="400dp"
         android:layout_centerInParent="true">
         <ImageView
-            android:id="@+id/Map"
+            android:id="@+id/map"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:src="@drawable/pavillon"
             android:scaleType="fitCenter"/>
 
         <ImageView
@@ -269,8 +268,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/dot"
-            android:layout_x="7dp"
-            android:layout_y="150dp"/>
+            android:layout_x="135dp"
+            android:layout_y="175dp"/>
 
     </AbsoluteLayout>
 

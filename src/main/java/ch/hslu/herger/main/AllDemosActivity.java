@@ -3,6 +3,7 @@ package ch.hslu.herger.main;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.View;
 import android.widget.Toast;
 
@@ -10,6 +11,9 @@ import ch.hslu.herger.main.R;
 
 import org.xmlpull.v1.XmlPullParserException;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 
 import ch.hslu.herger.config.Configuration;
@@ -76,14 +80,59 @@ public class AllDemosActivity extends Activity {
     });
   }
 
-    public void setConfiguration() {
-        try {
-            ((Configuration) this.getApplication()).setLocationList(LocationReader.readXML());
-            Toast.makeText(this, "Configuration is set", Toast.LENGTH_LONG).show();
-        }catch (XmlPullParserException e) {
-            e.printStackTrace();
-        }catch (IOException e) {
-            e.printStackTrace();
+    private void setConfiguration() {
+        File folder = new File(Environment.getExternalStorageDirectory() + "/iBeaconIndoorLokalisierung");
+        if (!folder.exists()) {
+            folder.mkdir();
+            readConfigFile();
+        }else{
+            readConfigFile();
         }
+
     }
+
+    private void readConfigFile() {
+        File sdcard = Environment.getExternalStorageDirectory();
+
+        //Get the xml file
+        File file = new File(sdcard, "/iBeaconIndoorLokalisierung/config.xml");
+
+        if (file.exists()) {
+            //Read text from file
+            StringBuilder text = new StringBuilder();
+
+            try {
+                BufferedReader br = new BufferedReader(new FileReader(file));
+                String line;
+
+                while ((line = br.readLine()) != null) {
+                    text.append(line);
+                    text.append('\n');
+                }
+                br.close();
+
+                String config = text.toString();
+                System.out.println("CONFIG = "+config);
+
+                try {
+                    ((Configuration) this.getApplication()).setLocationList(LocationReader.readXML(config));
+                    Toast.makeText(this, "Configuration is set", Toast.LENGTH_LONG).show();
+                } catch (XmlPullParserException e) {
+                    Toast.makeText(this, "Error while reading Configuration", Toast.LENGTH_LONG).show();
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    Toast.makeText(this, "Error while reading Configuration", Toast.LENGTH_LONG).show();
+                    e.printStackTrace();
+                }
+            } catch (IOException e) {
+                //You'll need to add proper error handling here
+                Toast.makeText(this, "Error while reading Configuration", Toast.LENGTH_LONG).show();
+                e.printStackTrace();
+            }
+        } else {
+            Toast.makeText(this, "config.xml not found", Toast.LENGTH_LONG).show();
+        }
+
+    }
+
 }
