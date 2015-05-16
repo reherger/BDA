@@ -55,8 +55,6 @@ import com.estimote.sdk.Region;
 import com.estimote.sdk.utils.L;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -64,13 +62,11 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import ch.hslu.herger.beacon.BeaconComparator;
 import ch.hslu.herger.config.Configuration;
 import ch.hslu.herger.config.XMLBeacon;
 import ch.hslu.herger.config.XMLDoor;
 import ch.hslu.herger.config.XMLLocation;
 import ch.hslu.herger.config.XMLRoom;
-import ch.hslu.herger.data.DataHandler;
 import ch.hslu.herger.main.R;
 
 public class SensorFusionActivity extends Activity

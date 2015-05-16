@@ -27,7 +27,7 @@
         android:label="iBeacon - Indoor Lokalisierung"
         android:theme="@android:style/Theme.Holo.Light" >
         <activity
-            android:name="ch.hslu.herger.main.AllDemosActivity"
+            android:name=".MainActivity"
             android:label="iBeacon - Indoor Lokalisierung"
             android:screenOrientation="portrait" >
             <intent-filter>
@@ -35,10 +35,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name="ch.hslu.herger.main.BeaconScannerActivity"
-            android:label="Select Beacon"
-            android:screenOrientation="portrait" />
 
         <!-- Estimote service responsible for scanning beacons. -->
         <service
@@ -51,19 +47,9 @@
             android:screenOrientation="portrait">
         </activity>
         <activity
-            android:name="ch.hslu.herger.sensor.LinearAccelerationActivity"
-            android:label="@string/title_activity_linear_acceleration" >
-
-            <!-- android:theme="@android:style/Theme.NoDisplay"> -->
-        </activity>
-        <activity
             android:name="ch.hslu.herger.sensor.SensorFusionActivity"
             android:label="@string/title_activity_sensor_fusion"
             android:screenOrientation="portrait" >
-        </activity>
-        <activity
-            android:name="ch.hslu.herger.sensor.StepDetector"
-            android:label="@string/title_activity_step_detector" >
         </activity>
     </application>
 

@@ -7,8 +7,6 @@ import android.os.Environment;
 import android.view.View;
 import android.widget.Toast;
 
-import ch.hslu.herger.main.R;
-
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.BufferedReader;
@@ -18,22 +16,20 @@ import java.io.IOException;
 
 import ch.hslu.herger.config.Configuration;
 import ch.hslu.herger.config.LocationReader;
-import ch.hslu.herger.sensor.LinearAccelerationActivity;
 import ch.hslu.herger.sensor.SensorFusionActivity;
-import ch.hslu.herger.sensor.StepDetector;
 
 /**
  * Shows all available demos.
  *
  * @author Reto Herger
  */
-public class AllDemosActivity extends Activity {
+public class MainActivity extends Activity {
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
-    setContentView(R.layout.all_demos);
+    setContentView(R.layout.main);
 
     // Read configuration file
     setConfiguration();
@@ -41,35 +37,18 @@ public class AllDemosActivity extends Activity {
     findViewById(R.id.ins_button).setOnClickListener(new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            Intent intent = new Intent(AllDemosActivity.this, SensorFusionActivity.class);
+            Intent intent = new Intent(MainActivity.this, SensorFusionActivity.class);
             startActivity(intent);
         }
     });
 
-      findViewById(R.id.sensorFusion_Button).setOnClickListener(new View.OnClickListener() {
+    findViewById(R.id.sensorFusion_Button).setOnClickListener(new View.OnClickListener() {
           @Override
           public void onClick(View v) {
-              Intent intent = new Intent(AllDemosActivity.this, InsActivity.class);
+              Intent intent = new Intent(MainActivity.this, InsActivity.class);
               startActivity(intent);
-          }
-      });
-
-      findViewById(R.id.sensorTest_Button).setOnClickListener(new View.OnClickListener() {
-          @Override
-          public void onClick(View v) {
-              Intent intent = new Intent(AllDemosActivity.this, LinearAccelerationActivity.class);
-              intent.putExtra(BeaconScannerActivity.EXTRAS_TARGET_ACTIVITY, InsActivity.class.getName());
-              startActivity(intent);
-          }
-      });
-
-      findViewById(R.id.stepCounter_Button).setOnClickListener(new View.OnClickListener() {
-          @Override
-          public void onClick(View v) {
-              Intent intent = new Intent(AllDemosActivity.this, StepDetector.class);
-              startActivity(intent);
-          }
-      });
+            }
+  });
 
 
     findViewById(R.id.XMLReader_button).setOnClickListener(new View.OnClickListener() {

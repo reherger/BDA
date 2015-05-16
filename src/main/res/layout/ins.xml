@@ -176,7 +176,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/dot"
-            android:layout_x="175dp"
+            android:layout_x="130dp"
             android:layout_y="190dp"/>
 
     </AbsoluteLayout>

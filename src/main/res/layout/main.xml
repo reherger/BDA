@@ -1,20 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent">
-
-    <TextView
-      android:id="@+id/tvNearestBeacon"
-      android:text="Nearest Beacon:"
-      android:layout_width="match_parent"
-      android:layout_height="match_parent" />
-
-
-  <ListView
-      android:id="@+id/device_list"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
       android:orientation="vertical"
       android:layout_width="match_parent"
-      android:layout_height="match_parent"
-      android:layout_marginTop="20dp"/>
-</FrameLayout>
+      android:layout_height="wrap_content"
+      android:layout_gravity="center_vertical">
+
+    <Button
+      android:id="@+id/ins_button"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:text="Indoor Navigation System"
+      android:layout_margin="5dp"/>
+
+  <Button
+      android:id="@+id/sensorFusion_Button"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:text="Position Calculation Demo"
+      android:layout_margin="5dp"/>
+
+  <Button
+      android:id="@+id/XMLReader_button"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:text="Read XML File"
+      android:layout_margin="5dp"/>
+
+</LinearLayout>

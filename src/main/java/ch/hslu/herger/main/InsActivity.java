@@ -68,7 +68,6 @@ import ch.hslu.herger.beacon.BeaconComparator;
 import ch.hslu.herger.config.Configuration;
 import ch.hslu.herger.config.XMLBeacon;
 import ch.hslu.herger.config.XMLLocation;
-import ch.hslu.herger.data.DataHandler;
 import ch.hslu.herger.main.R;
 
 public class InsActivity extends Activity
@@ -111,7 +110,7 @@ public class InsActivity extends Activity
     private double mapY;
     // testpurpose
     private double positionX = 215d;
-    private double positionY = 15d;
+    private double positionY = 50d;
 
 
 
@@ -128,7 +127,7 @@ public class InsActivity extends Activity
     public static final float EPSILON = 0.000000001f;
     private static final float NS2S = 1.0f / 1000000000.0f;
     private static final double D2RAD = (2*Math.PI/360);
-    private static final double M2DP = 1*10;
+    private static final double M2DP = 1*20;
     private float timestamp;
     private float timestampAccel;
 
@@ -173,9 +172,6 @@ public class InsActivity extends Activity
     // Acceleration Strings for Logging
     private static StringBuilder sbX = new StringBuilder(10000000);
     private static StringBuilder sbY = new StringBuilder(10000000);
-
-    // dataHandler
-    private DataHandler dataHandler;
 
     private static final String TAG = InsActivity.class.getSimpleName();
 
@@ -262,9 +258,6 @@ public class InsActivity extends Activity
         // Set Display Metrics
         metrics = getApplicationContext().getResources().getDisplayMetrics();
         pxTodp = metrics.density;
-
-        // Initialize DataHandler
-        dataHandler = DataHandler.getInstance();
 
         // Configure verbose debug logging.
         L.enableDebugLogging(true);
@@ -605,7 +598,7 @@ public class InsActivity extends Activity
             tempSpeed[1] = worldLinearAccel[1]*dTAccel;
 
             // ignore small acceleration
-            if(worldLinearAccel[0]>0.18f){
+            if(worldLinearAccel[0]>0.25f){
                 if(speed[0] < MINSPEED){
                     speed[0] = MINSPEED;
                     speed[0] += tempSpeed[0];
@@ -622,7 +615,7 @@ public class InsActivity extends Activity
             }else {
                 noMovementCount++;
             }
-            if(worldLinearAccel[1]>0.18f){
+            if(worldLinearAccel[1]>0.25f){
                 if(speed[1] < MINSPEED){
                     speed[1] = MINSPEED;
                     speed[1] += tempSpeed[1];
@@ -657,7 +650,7 @@ public class InsActivity extends Activity
 
         // TODO calculate XY DIRECTION ON MAP
         if(true == true) {
-            float angleToNorth = -10f;
+            float angleToNorth = 2f;
             double deviceDirection = fusedOrientation[0]* 180/Math.PI;
             double[] rotatedVektor = new double[2];
             double distanceX = distance[0]*0.2d;
