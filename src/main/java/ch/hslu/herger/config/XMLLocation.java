@@ -10,6 +10,7 @@ public class XMLLocation {
     private String name;
     private String pathToMap;
     private String angleToNorth;
+    private String ratio;
     private List<XMLRoom> roomList;
     private List<XMLBeacon> beaconList;
 
@@ -43,6 +44,14 @@ public class XMLLocation {
 
     public void setAngleToNorth(String angleToNorth) {
         this.angleToNorth = angleToNorth;
+    }
+
+    public String getRatio() {
+        return ratio;
+    }
+
+    public void setRatio(String ratio) {
+        this.ratio = ratio;
     }
 
     public List<XMLRoom> getRoomList() {

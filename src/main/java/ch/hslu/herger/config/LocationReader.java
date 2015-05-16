@@ -23,6 +23,7 @@ public class LocationReader {
         "<name>HSLU</name>"+
         "<pathToMap>hslu.jpg</pathToMap>"+
         "<angleToNorth>-10</angleToNorth>"+
+        "<ratio>20</ratio>"+
         "<roomList>"+
             "<room>"+
                 "<roomId>001001</roomId>"+
@@ -169,6 +170,9 @@ public class LocationReader {
         }else if(name.equalsIgnoreCase("angleToNorth")){
             xpp.next();
             location.setAngleToNorth(xpp.getText());
+        }else if(name.equalsIgnoreCase("ratio")){
+            xpp.next();
+            location.setRatio(xpp.getText());
         }else if(name.equalsIgnoreCase("roomList")){
             roomList = new ArrayList<XMLRoom>();
         }else if(name.equalsIgnoreCase("room")){

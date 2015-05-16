@@ -127,15 +127,11 @@ implements SensorEventListener {
     private float[] rotationMatrix = new float[9];
     
     public static final float EPSILON = 0.000000001f;
-    private static final float NS2S = 1.0f / 1000000000.0f;
-    private static final double D2RAD = (2*Math.PI/360);
-    private static final double M2DP = 1*10;
-    private float PX2DP;
+    private static final float NS2S = 1.0f / 1000000000.0f; // Nanoseconds to Seconds
+    private static final double D2RAD = (2*Math.PI/360); // Degree to Radian
+    private float PX2DP; // support for different resolutions
 	private float timestamp;
     private float timestampAccel;
-
-    // Constants for the low-pass accelerometer filter
-    private static final float ALPHA = 0.15f;
 
 	private boolean initState = true;
     
@@ -145,17 +141,8 @@ implements SensorEventListener {
 	
 	// The following members are only for displaying the sensor output.
 	public Handler mHandler;
-    private TableLayout tableDebug;
-	private TextView mAzimuthView;
-	private TextView mPitchView;
-	private TextView mRollView;
-    private TextView mLinAccX;
-    private TextView mLinAccY;
-    private TextView mLinAccZ;
-    private TextView mSpeedX;
-    private TextView mSpeedY;
-    private TextView mDistX;
-    private TextView mDistY;
+	private TextView mNorthView;
+	private TextView mAccuracyView;
     private TextView mCurrentBeacon;
 
     private AbsoluteLayout positionMap;
@@ -164,9 +151,13 @@ implements SensorEventListener {
     private ImageView beaconPosition;
 
     private RelativeLayout locationWarning;
+    private RelativeLayout probabilityWarning;
 
     private boolean running = false;
     private boolean inBeaconRange = false;
+    private float timePassed;
+    private float probability;
+    private float dTAccel;
 
 
 	DecimalFormat d = new DecimalFormat("#.##");
@@ -189,6 +180,7 @@ implements SensorEventListener {
     private static XMLLocation currentLocation;
     private static XMLRoom currentRoom;
     private static List<XMLDoor> currentDoorList;
+    private static double ratio; // ratio for meters on map to dynamic pixels
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -218,19 +210,10 @@ implements SensorEventListener {
         // GUI stuff
         mHandler = new Handler();
         d.setRoundingMode(RoundingMode.HALF_UP);
-        d.setMaximumFractionDigits(3);
-        d.setMinimumFractionDigits(3);
-        tableDebug = (TableLayout)findViewById(R.id.tableDebug);
-        mAzimuthView = (TextView)findViewById(R.id.textView4);
-        mPitchView = (TextView)findViewById(R.id.textView5);
-        mRollView = (TextView)findViewById(R.id.textView6);
-        mLinAccX = (TextView)findViewById(R.id.textViewLAXValue);
-        mLinAccY = (TextView)findViewById(R.id.textViewLAYValue);
-        mLinAccZ = (TextView)findViewById(R.id.textViewLAZValue);
-        mSpeedX = (TextView)findViewById(R.id.textViewSpeedXValue);
-        mSpeedY = (TextView)findViewById(R.id.textViewSpeedYValue);
-        mDistX = (TextView)findViewById(R.id.textViewDistXValue);
-        mDistY = (TextView)findViewById(R.id.textViewDistYValue);
+        d.setMaximumFractionDigits(0);
+        d.setMinimumFractionDigits(0);
+        mNorthView = (TextView)findViewById(R.id.textView4);
+        mAccuracyView = (TextView)findViewById(R.id.textView5);
         mCurrentBeacon = (TextView)findViewById(R.id.textViewCurrentBeaconValue);
 
         positionMap = (AbsoluteLayout) findViewById(R.id.positionMap);
@@ -241,6 +224,7 @@ implements SensorEventListener {
         beaconPosition = (ImageView) findViewById(R.id.beaconPosition);
 
         locationWarning = (RelativeLayout) findViewById(R.id.locationWarning);
+        probabilityWarning = (RelativeLayout) findViewById(R.id.probabilityWarning);
 
         getActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -272,7 +256,6 @@ implements SensorEventListener {
                         }else{
                             inBeaconRange = false;
                         }
-                        System.out.println("BEACON = " + currentXMLBeacon.getMajor());
 
                     }else
                         running = false;
@@ -557,13 +540,6 @@ implements SensorEventListener {
         }
     }
 
-    public void accelerometerLowPass(SensorEvent event)
-    {
-        for(int i=0; i<event.values.length; i++){
-            linearAccel[i] = linearAccel[i] + ALPHA * (event.values[i] - linearAccel[i]);
-        }
-    }
-
     // Transforms AccelerationVectors from Device coordinate system to world coordinate system
     public void calcAccelInWorldCoordinates(long time) {
 
@@ -584,12 +560,13 @@ implements SensorEventListener {
 
     public void calcDistanceVectors(long time) {
         if(timestampAccel != 0) {
-            final float dTAccel = (time - timestampAccel) * NS2S;
+            dTAccel = (time - timestampAccel) * NS2S;
             tempSpeed[0] = worldLinearAccel[0]*dTAccel;
             tempSpeed[1] = worldLinearAccel[1]*dTAccel;
 
             // ignore small acceleration
-            if(worldLinearAccel[0]>0.18f){
+            if(worldLinearAccel[0]>0.25f){
+                calcProbability();
                 if(speed[0] < MINSPEED){
                     speed[0] = MINSPEED;
                     speed[0] += tempSpeed[0];
@@ -606,7 +583,8 @@ implements SensorEventListener {
             }else {
                 noMovementCount++;
             }
-            if(worldLinearAccel[1]>0.18f){
+            if(worldLinearAccel[1]>0.25f){
+                calcProbability();
                 if(speed[1] < MINSPEED){
                     speed[1] = MINSPEED;
                     speed[1] += tempSpeed[1];
@@ -618,6 +596,7 @@ implements SensorEventListener {
                 }else {
                     speed[1] += tempSpeed[1];
                     distance[1] = speed[1]*dTAccel;
+                    System.out.println("distance Y = "+distance[1]);
                 }
                 noMovementCount = 0;
             }else {
@@ -648,6 +627,7 @@ implements SensorEventListener {
         if(currentLocation != null) {
 
             float angleToNorth = Float.valueOf(currentLocation.getAngleToNorth());
+
             double deviceDirection = fusedOrientation[0]* 180/Math.PI;
             double[] rotatedVektor = new double[2];
             // decrease influence of x direction
@@ -664,6 +644,7 @@ implements SensorEventListener {
             // set vectors for displaying on map
             // Y-Vector * -1 to get correct direction
             mapX = rotatedVektor[0];
+            System.out.println("MAP X = "+mapX);
             mapY = rotatedVektor[1] * -1;
 
         }
@@ -672,7 +653,7 @@ implements SensorEventListener {
     }
 
     public void prohibitWallCrossing(){
-        if(currentRoom != null && currentDoorList != null){
+        if(currentRoom != null && currentDoorList != null) {
             // get postion of walls
             double minX = Double.valueOf(currentRoom.getXleftUpperCorner());
             double maxX = minX + Double.valueOf(currentRoom.getWidth());
@@ -680,39 +661,54 @@ implements SensorEventListener {
             double maxY = minY + Double.valueOf(currentRoom.getHeight());
 
 
-            if(positionX >= minX && positionX <= maxX) {
+            if (positionX >= minX && positionX <= maxX) {
                 // everything OK
-            }else{
-                for(XMLDoor door : currentDoorList){
+            } else {
+                for (XMLDoor door : currentDoorList) {
                     double dMinX = Double.valueOf(door.getxLeftUpperCorner());
                     double dMaxX = dMinX + Double.valueOf(door.getAreaWidth());
                     double dMinY = Double.valueOf(door.getyLeftUpperCorner());
                     double dMaxY = dMinY + Double.valueOf(door.getAreaHeight());
-                    if(positionX >= dMinX && positionX <= dMaxX && positionY >= dMinY && positionY <= dMaxY){
+                    if (positionX >= dMinX && positionX <= dMaxX && positionY >= dMinY && positionY <= dMaxY) {
                         // everything OK
-                    }else{
+                    } else {
                         // reset position to last known
                         positionX = lastPositionX;
+
+                        probability -= 2f;
                     }
                 }
             }
-            if(positionY >= minY && positionY <= maxY){
+            if (positionY >= minY && positionY <= maxY) {
                 // everything OK
-            }else{
+            } else {
                 // TODO check if value is in Door area
-                for(XMLDoor door : currentDoorList){
+                for (XMLDoor door : currentDoorList) {
                     double dMinX = Double.valueOf(door.getxLeftUpperCorner());
                     double dMaxX = dMinX + Double.valueOf(door.getAreaWidth());
                     double dMinY = Double.valueOf(door.getyLeftUpperCorner());
                     double dMaxY = dMinY + Double.valueOf(door.getAreaHeight());
-                    if(positionY >= dMinY && positionY <= dMaxY && positionX >= dMinX && positionX <= dMaxX){
+                    if (positionY >= dMinY && positionY <= dMaxY && positionX >= dMinX && positionX <= dMaxX) {
                         // everything OK
-                    }else{
+                    } else {
                         positionY = lastPositionY;
+
+                        probability -= 2f;
                     }
                 }
             }
         }
+    }
+
+    private void calcProbability(){
+        timePassed += dTAccel;
+        probability = (1f - (timePassed / 30f)) * 100f; // accuracy = 0 after 20sec of not reaching a beacon (cause called twice in calcDistanceVectors())
+
+    }
+
+    private void resetProbability(){
+        timePassed = 0f;
+        probability = 100f;
     }
 
     // **************************** GUI FUNCTIONS *********************************
@@ -721,20 +717,13 @@ implements SensorEventListener {
     	// case 0 was accMagOrientation
         // case 1 was gyroOrientation
         if(running){
-            //tableDebug.setVisibility(View.INVISIBLE);
-            mAzimuthView.setText(d.format(fusedOrientation[0] * 180/Math.PI) + '°');
-            mPitchView.setText(d.format(fusedOrientation[1] * 180/Math.PI) + '°');
-            mRollView.setText(d.format(fusedOrientation[2] * 180/Math.PI) + '°');
-            mLinAccX.setText(d.format(worldLinearAccel[0]) + 'm'+'/'+'s'+'^'+'2');
-            mLinAccY.setText(d.format(worldLinearAccel[1]) + 'm'+'/'+'s'+'^'+'2');
-            mLinAccZ.setText(d.format(linearAccel[2]) + 'm'+'/'+'s'+'^'+'2');
-            mSpeedX.setText(d.format(speed[0]) + 'm'+'/'+'s');
-            mSpeedY.setText(d.format(speed[1]) + 'm'+'/'+'s');
-            mDistX.setText(d.format(distance[0]) + 'm');
-            mDistY.setText(d.format(distance[1]) + 'm');
+            mNorthView.setText("North: "+d.format(fusedOrientation[0] * 180/Math.PI) + "°");
+            mAccuracyView.setText("Probability: "+d.format(probability)+"%");
             if(inBeaconRange){
+                resetProbability();
                 locationWarning.setVisibility(View.INVISIBLE);
-                mCurrentBeacon.setText(currentXMLBeacon.getMajor() + currentBeacon.getRssi());
+                probabilityWarning.setVisibility(View.INVISIBLE);
+                mCurrentBeacon.setText("Nearest Beacon: " + currentXMLBeacon.getMajor() + " / RSSI: " + currentBeacon.getRssi());
                 positionMap.setVisibility(View.VISIBLE);
                 mCurrentBeacon.setVisibility(View.VISIBLE);
                 positionX = Float.parseFloat(currentXMLBeacon.getxPos());
@@ -745,22 +734,27 @@ implements SensorEventListener {
                 beaconPosition.setX((float) positionX * PX2DP);
                 beaconPosition.setY((float) positionY * PX2DP);
             }else{
-                locationWarning.setVisibility(View.INVISIBLE);
-                beaconPosition.setVisibility(View.INVISIBLE);
-                mCurrentBeacon.setText(currentXMLBeacon.getMajor() + "not in range");
-                lastPositionX = positionX;
-                lastPositionY = positionY;
-                positionX += mapX*M2DP;
-                positionY += mapY*M2DP;
-                prohibitWallCrossing();
-                position.setX((float)positionX*PX2DP);
-                position.setY((float)positionY*PX2DP);
+                if(probability < 50f){
+                    //probabilityWarning.setVisibility(View.VISIBLE);
+                }else {
+                    locationWarning.setVisibility(View.INVISIBLE);
+                    probabilityWarning.setVisibility(View.INVISIBLE);
+                    beaconPosition.setVisibility(View.INVISIBLE);
+                    mCurrentBeacon.setText(currentXMLBeacon.getMajor() + " (not in range)");
+                    lastPositionX = positionX;
+                    lastPositionY = positionY;
+                    positionX += mapX * ratio;
+                    positionY += mapY * ratio;
+                    prohibitWallCrossing();
+                    position.setX((float) positionX * PX2DP);
+                    position.setY((float) positionY * PX2DP);
+                }
             }
         }else{
-            beaconPosition.setVisibility(View.INVISIBLE);
             locationWarning.setVisibility(View.VISIBLE);
+            beaconPosition.setVisibility(View.INVISIBLE);
+            probabilityWarning.setVisibility(View.INVISIBLE);
             positionMap.setVisibility(View.INVISIBLE);
-            //tableDebug.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -793,15 +787,13 @@ implements SensorEventListener {
                     XMLBeacon recognizedB = new XMLBeacon();
                     recognizedB = b;
                     currentLocation = loc;
+                    ratio = Double.valueOf(currentLocation.getRatio());
                     loadCorrectBackgroundMap(loc.getPathToMap());
-                    System.out.println("Current Location = " + currentLocation.getName());
                     // set current Room
                     for (XMLRoom r : loc.getRoomList()){
                         if(b.getMinor().equalsIgnoreCase(r.getRoomId())){
                             currentRoom = r;
-                            System.out.println("Current room = " + currentRoom.getRoomId());
                             currentDoorList = r.getDoorList();
-                            System.out.println("Current doorList = " + currentDoorList.toString());
                         }
                     }
 
@@ -813,7 +805,7 @@ implements SensorEventListener {
     }
 
     private static boolean isBeaconInRange(Beacon nearestBeacon){
-        if(nearestBeacon.getRssi()>-50){
+        if(nearestBeacon.getRssi()>-60){
             return true;
         }
         return false;
