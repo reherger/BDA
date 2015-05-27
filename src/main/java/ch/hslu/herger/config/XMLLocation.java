@@ -11,6 +11,7 @@ public class XMLLocation {
     private String pathToMap;
     private String angleToNorth;
     private String ratio;
+    private String accuracy;
     private List<XMLRoom> roomList;
     private List<XMLBeacon> beaconList;
 
@@ -68,5 +69,13 @@ public class XMLLocation {
 
     public void setBeaconList(List<XMLBeacon> beaconList) {
         this.beaconList = beaconList;
+    }
+
+    public String getAccuracy() {
+        return accuracy;
+    }
+
+    public void setAccuracy(String accuracy) {
+        this.accuracy = accuracy;
     }
 }

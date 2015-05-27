@@ -15,98 +15,6 @@ import java.util.List;
  */
 public class LocationReader {
 
-    public final static String SAMPLE_XML =
-    "<?xml version=\"1.0\"?>"+
-    "<locations>"+
-        "<location>"+
-        "<id>1</id>"+
-        "<name>HSLU</name>"+
-        "<pathToMap>hslu.jpg</pathToMap>"+
-        "<angleToNorth>-10</angleToNorth>"+
-        "<ratio>20</ratio>"+
-        "<roomList>"+
-            "<room>"+
-                "<roomId>001001</roomId>"+
-                "<xLeftUpperCornerRoom>140</xLeftUpperCornerRoom>"+
-                "<yLeftUpperCornerRoom>11</yLeftUpperCornerRoom>"+
-                "<width>140</width>"+
-                "<height>140</height>"+
-                "<doorList>"+
-                    "<door>"+
-                        "<xLeftUpperCornerDoor>125</xLeftUpperCornerDoor>"+
-                        "<yLeftUpperCornerDoor>110</yLeftUpperCornerDoor>"+
-                        "<areaWidth>50</areaWidth>"+
-                        "<areaHeight>25</areaHeight>"+
-                    "</door>"+
-                "</doorList>"+
-            "</room>"+
-            "<room>"+
-                "<roomId>002001</roomId>"+
-                "<xLeftUpperCornerRoom>74</xLeftUpperCornerRoom>"+
-                "<yLeftUpperCornerRoom>117</yLeftUpperCornerRoom>"+
-                "<width>61</width>"+
-                "<height>38</height>"+
-                "<doorList>"+
-                    "<door>"+
-                        "<xLeftUpperCornerDoor>74</xLeftUpperCornerDoor>"+
-                        "<yLeftUpperCornerDoor>145</yLeftUpperCornerDoor>"+
-                        "<areaWidth>61</areaWidth>"+
-                        "<areaHeight>25</areaHeight>"+
-                    "</door>"+
-                    "<door>"+
-                    "<xLeftUpperCornerDoor>125</xLeftUpperCornerDoor>"+
-                    "<yLeftUpperCornerDoor>110</yLeftUpperCornerDoor>"+
-                    "<areaWidth>50</areaWidth>"+
-                    "<areaHeight>25</areaHeight>"+
-                    "</door>"+
-                "</doorList>"+
-            "</room>"+
-            "<room>"+
-                "<roomId>003001</roomId>"+
-                "<xLeftUpperCornerRoom>33</xLeftUpperCornerRoom>"+
-                "<yLeftUpperCornerRoom>155</yLeftUpperCornerRoom>"+
-                "<width>148</width>"+
-                "<height>127</height>"+
-                "<doorList>"+
-                    "<door>"+
-                    "<xLeftUpperCornerDoor>74</xLeftUpperCornerDoor>"+
-                    "<yLeftUpperCornerDoor>145</yLeftUpperCornerDoor>"+
-                    "<areaWidth>61</areaWidth>"+
-                    "<areaHeight>25</areaHeight>"+
-                    "</door>"+
-                "</doorList>"+
-            "</room>"+
-        "</roomList>"+
-        "<beaconList>"+
-            // blue
-            "<beacon>"+
-                "<uuid>001</uuid>"+
-                "<major>110</major>"+
-                "<minor>001001</minor>"+
-                "<xPos>280</xPos>"+
-                "<yPos>12</yPos>"+
-            "</beacon>"+
-            // green
-            "<beacon>"+
-                "<uuid>02</uuid>"+
-                "<major>111</major>"+
-                "<minor>001001</minor>"+
-                "<xPos>145</xPos>"+
-                "<yPos>75</yPos>"+
-            "</beacon>"+
-            // lightBlue
-            // test
-            "<beacon>"+
-            "<uuid>02</uuid>"+
-            "<major>112</major>"+
-            "<minor>001001</minor>"+
-            "<xPos>280</xPos>"+
-            "<yPos>145</yPos>"+
-            "</beacon>"+
-        "</beaconList>"+
-        "</location>"+
-    "</locations>";
-
     private static List<XMLLocation> locList;
     private static XMLLocation location;
     private static List<XMLRoom> roomList;
@@ -173,6 +81,9 @@ public class LocationReader {
         }else if(name.equalsIgnoreCase("ratio")){
             xpp.next();
             location.setRatio(xpp.getText());
+        }else if(name.equalsIgnoreCase("accuracy")){
+            xpp.next();
+            location.setAccuracy(xpp.getText());
         }else if(name.equalsIgnoreCase("roomList")){
             roomList = new ArrayList<XMLRoom>();
         }else if(name.equalsIgnoreCase("room")){

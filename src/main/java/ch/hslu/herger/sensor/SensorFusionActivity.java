@@ -42,10 +42,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.AbsoluteLayout;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -96,7 +94,6 @@ implements SensorEventListener {
     private float[] worldLinearAccel = new float[3];
     private float[] tempSpeed = new float[2];
     private float[] speed = new float[2];
-    private float[] tempDistance = new float[2];
     private float[] distance = new float[2];
 
     private float MINSPEED = 1.0f;
@@ -160,9 +157,6 @@ implements SensorEventListener {
 
     private static final String TAG = SensorFusionActivity.class.getSimpleName();
 
-    public static final String EXTRAS_TARGET_ACTIVITY = "extrasTargetActivity";
-    public static final String EXTRAS_BEACON = "extrasBeacon";
-
     private static final int REQUEST_ENABLE_BT = 1234;
     private static final Region ALL_ESTIMOTE_BEACONS_REGION = new Region("rid", null, null, null);
 
@@ -174,6 +168,7 @@ implements SensorEventListener {
     private XMLBeacon currentXMLBeacon;
 
     private static XMLLocation currentLocation;
+    private float accuracyThreshold = 50f;
     private static XMLRoom currentRoom;
     private static List<XMLDoor> currentDoorList;
     private static double ratio; // ratio for meters on map to dynamic pixels
@@ -698,7 +693,7 @@ implements SensorEventListener {
 
     private void calcProbability(){
         timePassed += dTAccel;
-        probability = (1f - (timePassed / 30f)) * 100f; // accuracy = 0 after 20sec of not reaching a beacon (cause called twice in calcDistanceVectors())
+        probability = (1f - (timePassed / 30f)) * 100f; // accuracy = 0 after 30sec of not reaching a beacon (cause called twice in calcDistanceVectors())
 
     }
 
@@ -730,7 +725,7 @@ implements SensorEventListener {
                 beaconPosition.setX((float) positionX * PX2DP);
                 beaconPosition.setY((float) positionY * PX2DP);
             }else{
-                if(probability < 50f){
+                if(probability < accuracyThreshold){
                     //probabilityWarning.setVisibility(View.VISIBLE);
                 }else {
                     locationWarning.setVisibility(View.INVISIBLE);
@@ -783,6 +778,7 @@ implements SensorEventListener {
                     XMLBeacon recognizedB = new XMLBeacon();
                     recognizedB = b;
                     currentLocation = loc;
+                    accuracyThreshold = Float.valueOf(currentLocation.getAccuracy());
                     ratio = Double.valueOf(currentLocation.getRatio());
                     loadCorrectBackgroundMap(loc.getPathToMap());
                     // set current Room
