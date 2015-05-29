@@ -726,7 +726,7 @@ implements SensorEventListener {
                 beaconPosition.setY((float) positionY * PX2DP);
             }else{
                 if(probability < accuracyThreshold){
-                    //probabilityWarning.setVisibility(View.VISIBLE);
+                    probabilityWarning.setVisibility(View.VISIBLE);
                 }else {
                     locationWarning.setVisibility(View.INVISIBLE);
                     probabilityWarning.setVisibility(View.INVISIBLE);
@@ -779,6 +779,7 @@ implements SensorEventListener {
                     recognizedB = b;
                     currentLocation = loc;
                     accuracyThreshold = Float.valueOf(currentLocation.getAccuracy());
+                    System.out.println("AccuracyThreshold = "+accuracyThreshold);
                     ratio = Double.valueOf(currentLocation.getRatio());
                     loadCorrectBackgroundMap(loc.getPathToMap());
                     // set current Room
